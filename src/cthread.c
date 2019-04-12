@@ -9,9 +9,7 @@
 
 FILA2 ready, executing, blocked;
 ucontext_t *final_context = NULL;
-s_TCB *main_tcb = NULL;
-
-
+TCB_t *main_tcb = NULL;
 
 
 //

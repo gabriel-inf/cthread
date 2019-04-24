@@ -10,14 +10,62 @@
 // 128 MB
 #define STACK_SIZE 131072
 
+// Priorities
+#define LOW_PRIO 0
+#define MEDIUM_PRIO 1
+#define HIGH_PRIO 2
 
-// TRÊS NÍVEIS DE PRIORIDADE: 0 (ALTA), 1 (MÉDIA) e 2 (BAIXA)
-FILA2 ready, executing, blocked;
+#define MAIN_TID 0
+
+#define ERROR_PRIO_NOT_DEFINED -1
+#define  FAILED -1
+#define SUCCESS 0
+
+FILA2 ready_low, ready_medium, ready_high, executing, blocked;
+
 ucontext_t *final_context = NULL;
 TCB_t *main_tcb = NULL;
-int id_count = 0;
+int id_count = 1;
+int thread_main_already_created = 0;
 
+/*
+ * Create a context
+ */
+int create_context(ucontext_t* context, ucontext_t* next) {
 
+    if(getcontext(context) == FAILED) {
+        return FAILED;
+    }
+
+    context->uc_link = next;
+    context->uc_stack.ss_sp = (char*) malloc(STACK_SIZE);
+    context->uc_stack.ss_size = STACK_SIZE;
+
+    return SUCCESS;
+}
+
+/*
+ *  Initializes the main thread
+ *  returns 0 if succeeded and -1 if failed
+ */
+int initialize_main_thread() {
+
+    ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
+
+    create_context(current_context, NULL);
+
+    TCB_t *main_thread = malloc(sizeof(TCB_t));
+    main_thread->tid = MAIN_TID;
+    main_thread->prio = LOW_PRIO;
+
+    if (AppendFila2(ready_low) == SUCCESS) {
+        thread_main_already_created = 1;
+        return SUCCESS;
+    } else {
+        return FAILED;
+    }
+
+}
 
 /**
  * ccrete is responsible for creating a new threading and adding it to the ready queue
@@ -28,35 +76,36 @@ int id_count = 0;
  */
 int ccreate (void* (*start)(void*), void *arg, int prio) {
 
-    // save the existing context (for the first run is the main)
-    ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
-    if(getcontext(current_context) == -1) {
-        return FAILED;
+    if(!thread_main_already_created) {
+        initialize_main_thread();
     }
 
-    // this struct will be responsible for maintaining the thread state
     TCB_t *tcb = (TCB_t *) malloc(sizeof(TCB_t));
-
-    current_context->uc_stack.ss_sp = (char*) malloc(STACK_SIZE * sizeof(char));
-    current_context->uc_stack.ss_size = STACK_SIZE;
-    current_context->uc_link = NULL;
-
-    makecontext(current_context, (void (*) (void)) CB_end_thread, 0);
 
     tcb->tid = id_count++;
     tcb->state = PROCST_APTO;
+    tcb->prio = prio;
+
+    ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
+
+    create_context(current_context, NULL);
+    create_context(&(tcb->context), current_context);
+
+    makecontext(current_context, (void (*) (void)) CB_end_thread, 0);
+    makecontext(&(tcb->context), (void (*) (void)) start, 1, arg);
 
     switch (prio){
-        case 0:
-        case 1:
-        case 2:
-            tcb->prio = prio;
-            AppendFila2(ready, tcb);
+        case HIGH_PRIO:
+            AppendFila2(ready_high, tcb);
+            break;
+        case MEDIUM_PRIO:
+            AppendFila2(ready_medium, tcb);
+            break;
+        case LOW_PRIO:
+            AppendFila2(ready_low, tcb);
             break;
         default:
             return ERROR_PRIO_NOT_DEFINED;
     }
-
-
-
+    return tcb->tid;
 }

@@ -248,3 +248,8 @@ DerivedData/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.gitignore.io/api/c,linux,xcode,macos,clion,windows,codeblocks
+
+#### Custom
+!/bin
+/bin/*
+!/bin/support.o

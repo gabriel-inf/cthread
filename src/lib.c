@@ -1,9 +1,3 @@
-#if defined(__APPLE__)
-    #define _XOPEN_SOURCE
-    #define PLATFORM_NAME "apple"
-#elif
-    #define PLATFORM_NAME "nao apple"
-#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -42,7 +36,7 @@ int csignal(csem_t *sem) {
 
 int cidentify (char *name, int size) {
 	printf("Estou rodando com ");
-	printf(PLATFORM_NAME);
+	printf("Linux porque é o jeito");
 	printf("\n");
 	return 0;
 }

@@ -2,24 +2,22 @@
 #include <string.h>
 #include <stdlib.h>
 #include "ucontext.h"
-
 #include "../include/cthread.h"
 #include "../include/support.h"
 #include "../include/cdata.h"
-
-// 128 MB
-#define STACK_SIZE 131072
 
 // Priorities
 #define LOW_PRIO 0
 #define MEDIUM_PRIO 1
 #define HIGH_PRIO 2
 
-#define MAIN_TID 0
-
-#define ERROR_PRIO_NOT_DEFINED -1
-#define  FAILED -1
+// Errors
+#define FAILED -1
+#define ERROR_PRIO_NOT_DEFINED -2
 #define SUCCESS 0
+
+// Other important constants
+#define MAIN_TID 0
 
 FILA2 ready_low, ready_medium, ready_high, executing, blocked;
 
@@ -38,8 +36,8 @@ int create_context(ucontext_t* context, ucontext_t* next) {
     }
 
     context->uc_link = next;
-    context->uc_stack.ss_sp = (char*) malloc(STACK_SIZE);
-    context->uc_stack.ss_size = STACK_SIZE;
+    context->uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+    context->uc_stack.ss_size = SIGSTKSZ;
 
     return SUCCESS;
 }

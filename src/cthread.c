@@ -19,12 +19,22 @@
 // Other important constants
 #define MAIN_TID 0
 
-FILA2 ready_low, ready_medium, ready_high, executing, blocked;
+PFILA2 ready_low, ready_medium, ready_high, executing, blocked;
 
 ucontext_t *final_context = NULL;
 TCB_t *main_tcb = NULL;
 int id_count = 1;
 int thread_main_already_created = 0;
+
+
+/*
+ * Handle the thread termination
+ * is used as a callback for the makecontext function
+ */
+int handle_termination() {
+
+	return 0;
+}
 
 /*
  * Create a context
@@ -56,7 +66,7 @@ int initialize_main_thread() {
     main_thread->tid = MAIN_TID;
     main_thread->prio = LOW_PRIO;
 
-    if (AppendFila2(ready_low) == SUCCESS) {
+    if (AppendFila2(ready_low, main_thread) == SUCCESS) {
         thread_main_already_created = 1;
         return SUCCESS;
     } else {
@@ -89,7 +99,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     create_context(current_context, NULL);
     create_context(&(tcb->context), current_context);
 
-    makecontext(current_context, (void (*) (void)) CB_end_thread, 0);
+    makecontext(current_context, (void (*) (void)) handle_termination, 0);
     makecontext(&(tcb->context), (void (*) (void)) start, 1, arg);
 
     switch (prio){

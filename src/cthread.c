@@ -31,7 +31,6 @@ int thread_main_already_created = 0;
  * is used as a callback for the makecontext function
  */
 int handle_termination() {
-
 	return 0;
 }
 
@@ -90,24 +89,26 @@ int initialize_main_thread() {
  */
 int ccreate (void* (*start)(void*), void *arg, int prio) {
 
+    // first thing to do is to create the thread main if it is not created
     if(!thread_main_already_created) {
         initialize_main_thread();
     }
-
+    // this is the struct that will have the thread block
     TCB_t *tcb = (TCB_t *) malloc(sizeof(TCB_t));
 
     tcb->tid = id_count++;
     tcb->state = PROCST_APTO;
     tcb->prio = prio;
 
+    // this context will be used as callback
     ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
-
     create_context(current_context, NULL);
-    create_context(&(tcb->context), current_context);
+    makecontext(current_context, (void (*) (void)) handle_termination, 0); // when called, the current_context will execute the handle_termination function
 
-    makecontext(current_context, (void (*) (void)) handle_termination, 0);
+    create_context(&(tcb->context), current_context); // here is tricky, when the thread context is finished, it points to the current context (callback)
     makecontext(&(tcb->context), (void (*) (void)) start, 1, arg);
 
+    // adding the tcb to the priority queue
     switch (prio){
         case HIGH_PRIO:
             AppendFila2(&ready_high, tcb);

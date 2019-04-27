@@ -11,6 +11,9 @@
 #include "../include/support.h"
 #include "../include/cthread.h"
 #include <stdio.h>
+#include <stdlib.h>
+#define SUCCESS_CODE 0
+#define ERROR_CODE 10
 
 /*
 void* func0(void *arg) {
@@ -22,6 +25,21 @@ void* func1(void *arg) {
 	printf("Eu sou a thread ID1 imprimindo %d\n", *((int *)arg));
     return 0;
 }*/
+
+
+int inicia(csem_t *sem, int count) {
+
+	PFILA2 pfila = malloc(sizeof(FILA2));
+	 
+	sem->count = count;
+	sem->fila = pfila;
+	
+	if (CreateFila2(pfila) == SUCCESS_CODE) {
+		return SUCCESS_CODE;
+	} else {
+		return ERROR_CODE;
+	}
+}
 
 int main(int argc, char *argv[]) {
 
@@ -36,18 +54,17 @@ int main(int argc, char *argv[]) {
 	cjoin(id0);
 	cjoin(id1);*/
 
-	printf("Eu sou a main voltando para terminar o programaajasnajnajsnajnsjasnajsn\n");
+	//printf("Eu sou a main voltandpara terminar o\n");
+	printf("Como Assim\n");
 
-	char teste  = 't';
-	printf("aloooooooọ00000000000000000000000000000000000000000000000");
-	cidentify(&teste, 100);
-	printf("aloooooooọ111111111111111111111111111111111111111111");
-	csem_t *semaphore;
-	printf("aloooooooọ");
-	int result = csem_init(semaphore, 100);
-	printf("aloooooooọ22222222222222222222222222222222222222222222222222222");
-	printf("Resultado inicializacao do semaforo =");
-	
+	csem_t *semaphore = malloc(sizeof(csem_t));
+	printf("aloooooooọ\n");
+
+	int result = inicia(semaphore, 100);
+	printf("Resultado inicializacao do semaforo =\n");
+	printf("%d\n", result);	
+	printf("%d\n", semaphore->count);
+
 	return 0;
 
 }

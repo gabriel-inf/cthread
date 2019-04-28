@@ -13,10 +13,13 @@
 #include "../include/cdata.h"
 #include <stdio.h>
 #include <stdlib.h>
-#define SUCCESS_CODE 0
-#define ERROR_CODE 10
 
-PFILA2 executing;
+// Conforme espec, erro eh negativo e sucesso eh zero
+
+#define SUCCESS_CODE 0
+#define ERROR_CODE -10 
+
+PFILA2 executing, ready;
 
 /*
 void* func0(void *arg) {
@@ -64,6 +67,22 @@ int espera(csem_t *sem) {
 	return SUCCESS_CODE;
 }
 
+int sinal(csem_t *sem) {
+
+	sem->count ++;
+	if (sem->count <= 0) {
+
+		TCB_t *process_to_wake = (TCB_t *) sem->fila->first->node;
+		if (FirstFila2(sem->fila) != SUCCESS_CODE) return ERROR_CODE;
+		if (DeleteAtIteratorFila2(sem->fila) != SUCCESS_CODE) return ERROR_CODE;
+		if (AppendFila2(ready, &process_to_wake) != SUCCESS_CODE) return ERROR_CODE;
+
+	}
+
+	return SUCCESS_CODE;
+
+}
+
 int main(int argc, char *argv[]) {
 
 	/*int	id0, id1;
@@ -91,12 +110,13 @@ int main(int argc, char *argv[]) {
 	csem_t *semaphore = malloc(sizeof(csem_t));
 	printf("aloooooooọ\n");
 
-	if (inicia(semaphore, 0) == SUCCESS_CODE ) {
+	if (inicia(semaphore, -10) == SUCCESS_CODE ) {
 
 		printf("deu certo inicializacao do semaphoro\n");
 
 	}
 	
+	ready = malloc(sizeof(FILA2));
 	executing = malloc(sizeof(FILA2));
 	if (CreateFila2(executing) == SUCCESS_CODE) {
 
@@ -111,6 +131,18 @@ int main(int argc, char *argv[]) {
 			}
 		}  
 	}
+
+	if (CreateFila2(ready) == SUCCESS_CODE) {
+
+		printf("deu certo creation ready\n");
+
+		if (sinal(semaphore) == SUCCESS_CODE) {
+			
+			printf("deu certo sinal\n");
+
+		}
+	}
+
 
 	return 0;
 

@@ -83,6 +83,16 @@ int sinal(csem_t *sem) {
 
 }
 
+int test_csem_init(int test_sem_count) {
+
+	csem_t *semaphore = malloc(sizeof(csem_t));
+	if (inicia(semaphore, test_sem_count) != SUCCESS_CODE) return ERROR_CODE;
+	if (semaphore->count != test_sem_count) return ERROR_CODE;
+	if (semaphore->fila == NULL) return ERROR_CODE;
+	
+	return SUCCESS_CODE;
+}
+
 int main(int argc, char *argv[]) {
 
 	/*int	id0, id1;
@@ -97,9 +107,13 @@ int main(int argc, char *argv[]) {
 	cjoin(id1);*/
 
 	//printf("Eu sou a main voltandpara terminar o\n");
-	printf("Como Assim\n");
-
 	
+	printf("%d\n", test_csem_init(10));
+	printf("%d\n", test_csem_init(-10));	
+	printf("%d\n", test_csem_init(0));
+	
+
+	/*
 	TCB_t *tcb_teste = malloc(sizeof(TCB_t));
 	tcb_teste->prio = 1;
 	tcb_teste->state = PROCST_EXEC;
@@ -141,7 +155,7 @@ int main(int argc, char *argv[]) {
 			printf("deu certo sinal\n");
 
 		}
-	}
+	}*/
 
 
 	return 0;

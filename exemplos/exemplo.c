@@ -75,6 +75,7 @@ int sinal(csem_t *sem) {
 		if (ready == NULL) return ERROR_CODE;
 
 		TCB_t *process_to_wake = (TCB_t *) sem->fila->first->node;
+		process_to_wake->state = PROCST_APTO;
 		if (FirstFila2(sem->fila) != SUCCESS_CODE) return ERROR_CODE;
 		if (DeleteAtIteratorFila2(sem->fila) != SUCCESS_CODE) return ERROR_CODE;
 		if (AppendFila2(ready, &process_to_wake) != SUCCESS_CODE) return ERROR_CODE;
@@ -150,13 +151,61 @@ int test_cwait_count_greater() {
 
 }
 
-int test_csignal() {
+int test_csignal_count_smaller() {
 
-	
+	TCB_t *tcb_teste = malloc(sizeof(TCB_t));
+	tcb_teste->prio = 1;
+	tcb_teste->state = PROCST_BLOQ;
+	tcb_teste->tid = 10;
+	ucontext_t test_context;
+	tcb_teste->context = test_context;
 
+	csem_t *semaphore = malloc(sizeof(csem_t));
+	if (inicia(semaphore, -10) != SUCCESS_CODE) return ERROR_CODE;
 
+	ready = malloc(sizeof(FILA2));
+	if (CreateFila2(ready) != SUCCESS_CODE) return ERROR_CODE;
+
+	if (AppendFila2(semaphore->fila, (void *)tcb_teste) != SUCCESS_CODE) return ERROR_CODE;
+	if (sinal(semaphore) != SUCCESS_CODE) return ERROR_CODE;
+
+	if (semaphore->count != -9) return ERROR_CODE;
+	if (tcb_teste->state != PROCST_APTO) return ERROR_CODE;
+
+	if (FirstFila2(semaphore->fila) == SUCCESS_CODE) return ERROR_CODE; //assert fila sem item
+	if (FirstFila2(ready) != SUCCESS_CODE) return ERROR_CODE; //assert fila com item
+
+	return SUCCESS_CODE;
 
 }
+
+int test_csignal_count_greater() {
+
+	TCB_t *tcb_teste = malloc(sizeof(TCB_t));
+	tcb_teste->prio = 1;
+	tcb_teste->state = PROCST_BLOQ;
+	tcb_teste->tid = 10;
+	ucontext_t test_context;
+	tcb_teste->context = test_context;
+
+	csem_t *semaphore = malloc(sizeof(csem_t));
+	if (inicia(semaphore, 10) != SUCCESS_CODE) return ERROR_CODE;
+
+	ready = malloc(sizeof(FILA2));;
+	if (CreateFila2(ready) != SUCCESS_CODE) return ERROR_CODE;
+
+	if (AppendFila2(semaphore->fila, (void *)tcb_teste) != SUCCESS_CODE) return ERROR_CODE;
+	if (sinal(semaphore) != SUCCESS_CODE) return ERROR_CODE;
+
+	if (semaphore->count != 11) return ERROR_CODE;
+	if (tcb_teste->state != PROCST_BLOQ) return ERROR_CODE;
+
+	if (FirstFila2(semaphore->fila) != SUCCESS_CODE) return ERROR_CODE;
+	if (FirstFila2(ready) == SUCCESS_CODE) return ERROR_CODE;
+
+	return SUCCESS_CODE;
+}
+
 
 int main(int argc, char *argv[]) {
 
@@ -178,56 +227,8 @@ int main(int argc, char *argv[]) {
 	printf("%d\n", test_csem_init(0));
 	printf("%d\n", test_cwait_count_smaller());
 	printf("%d\n", test_cwait_count_greater());
-
-	
-	
-	TCB_t *tcb_teste = malloc(sizeof(TCB_t));
-	tcb_teste->prio = 1;
-	tcb_teste->state = PROCST_EXEC;
-	tcb_teste->tid = 10;
-	ucontext_t test_context;
-	tcb_teste->context = test_context;
-
-	//PFILA2 filinha;
-	//printf("%d\n", AppendFila2(filinha, &tcb_teste));
-
-
-	/*
-	csem_t *semaphore = malloc(sizeof(csem_t));
-	printf("aloooooooọ\n");
-
-	if (inicia(semaphore, -10) == SUCCESS_CODE ) {
-
-		printf("deu certo inicializacao do semaphoro\n");
-
-	}
-	
-	ready = malloc(sizeof(FILA2));
-	executing = malloc(sizeof(FILA2));
-	if (CreateFila2(executing) == SUCCESS_CODE) {
-
-		printf("deu certo creation\n");
-
-		if ( AppendFila2(executing, (void *)tcb_teste) == SUCCESS_CODE ) {
-
-			printf("deu certo append\n");
-			if ( espera(semaphore) == SUCCESS_CODE ) {
-				printf("deu certo espera\n");
-
-			}
-		}  
-	}
-
-	if (CreateFila2(ready) == SUCCESS_CODE) {
-
-		printf("deu certo creation ready\n");
-
-		if (sinal(semaphore) == SUCCESS_CODE) {
-			
-			printf("deu certo sinal\n");
-
-		}
-	}*/
+	printf("%d\n", test_csignal_count_smaller());
+	printf("%d\n", test_csignal_count_greater());
 
 
 	return 0;

@@ -3,9 +3,6 @@
 #include "../include/support.h"
 #include "../include/cthread.h"
 
-#define SUCCESS_CODE 0
-#define ERROR_CODE -1
-
 int ccreate (void* (*start)(void*), void *arg, int prio) {
 	return -1;
 }
@@ -23,19 +20,7 @@ int cjoin(int tid) {
 }
 
 int csem_init(csem_t *sem, int count) {
-
-
-	printf("INICIALIZANDO O SEMAFORO");
-	PFILA2 pfila;
-	if (CreateFila2(pfila)) {
-		
-		*sem = (csem_t) { pfila, count};
-		printf("INICIALIZANDO O SEMAFORO COM SUCESSO");
-		return SUCCESS_CODE;
-	} else {
-		printf("INICIALIZANDO O SEMAFORO COM ERRO");
-		return ERROR_CODE;
-	}
+	return -1;
 }
 
 int cwait(csem_t *sem) {

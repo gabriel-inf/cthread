@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <string.h>
 #include "../include/support.h"
@@ -33,6 +34,7 @@ int csignal(csem_t *sem) {
 
 int cidentify (char *name, int size) {
 	printf("Estou rodando com ");
+	printf("Linux porque é o jeito");
 	printf("\n");
 	return 0;
 }

@@ -27,18 +27,12 @@ int thread_main_already_created = 0;
 
 
 /*
+ * TODO
  * Handle the thread termination
  * is used as a callback for the makecontext function
  */
 int handle_termination() {
 	return 0;
-}
-
-/*
- *  TODO
- */
-int handle_termination(){
-    return 0;
 }
 
 /*

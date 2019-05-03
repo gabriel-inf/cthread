@@ -5,6 +5,7 @@
 #include "../include/scheduler.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <ucontext.h>
 
 int scheduler_block_thread(TCB_t *thread, csem_t *sem) {
 
@@ -20,6 +21,13 @@ int scheduler_block_thread(TCB_t *thread, csem_t *sem) {
 	
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;		
 	if (AppendFila2(sem->fila, (void *)executing_thread)) return LINE_OPERATION_ERROR;
+	
+	
+	TCB_t *next = malloc(sizeof(TCB_t));
+	if (scheduler_get_first_ready_thread( &next ) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+	
+	if (swapcontext(&executing_thread->context, &next->context ) != SUCCESS_CODE) return CONTEXT_ERROR;
+	
 
 	return SUCCESS_CODE;
 
@@ -37,6 +45,23 @@ int scheduler_free_thread(csem_t *sem) {
 	return scheduler_insert_in_ready(thread_to_wake);
 
 }
+
+int scheduler_get_first_ready_thread( TCB_t** next ) {
+
+	// aqui eu vou catar direitinho conforme prioridades
+	
+	if ( ready == NULL ) return NULL_POINTER;
+	if ( next == NULL ) return NULL_POINTER;
+	if ( FirstFila2(ready) != SUCCESS_CODE ) return EMPTY_LINE;
+	
+	
+	*next = ready->first->node;
+
+	return SUCCESS_CODE;
+	
+}
+
+
 
 int scheduler_insert_in_ready(TCB_t *thread) {
 

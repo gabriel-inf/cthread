@@ -38,6 +38,24 @@ void test_scheduler_block_thread() {
 
 }
 
+void test_scheduler_get_first_ready_thread() {
+
+	ready = malloc(sizeof(FILA2));	
+	
+	TCB_t *thread = malloc(sizeof(TCB_t));
+	thread->tid = 2;
+	
+	TCB_t *next = malloc(sizeof(TCB_t));
+	next->tid = 3;
+
+	assert(AppendFila2(ready, (void *)thread) == SUCCESS_CODE);
+	
+	assert(scheduler_get_first_ready_thread(&next) == SUCCESS_CODE);
+
+	assert(next->tid == 2);
+
+}
+
 void test_scheduler_insert_in_ready() {
 
 }
@@ -68,7 +86,7 @@ void test_scheduler_free_thread() {
 
 int main(int argc, char *argv[]) {
 
-	test_scheduler_free_thread();
+	test_scheduler_get_first_ready_thread();
 	return 0;
 }
 

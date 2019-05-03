@@ -3,8 +3,6 @@
 #include <string.h>
 #include "../include/support.h"
 #include "../include/cthread.h"
-#include "../include/cdata.h"
-
 
 int ccreate (void* (*start)(void*), void *arg, int prio) {
 	return -1;
@@ -35,7 +33,9 @@ int csignal(csem_t *sem) {
 }
 
 int cidentify (char *name, int size) {
-	strncpy (name, "Sergio Cechin - 2017/1 - Teste de compilacao.", size);
+	printf("Estou rodando com ");
+	printf("Linux porque é o jeito");
+	printf("\n");
 	return 0;
 }
 

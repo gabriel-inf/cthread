@@ -14,25 +14,60 @@
 // Errors
 #define FAILED -1
 #define ERROR_PRIO_NOT_DEFINED -2
+#define NOTHING_TO_SCHEDULE -3
 #define SUCCESS 0
 
 // Other important constants
 #define MAIN_TID 0
 
-PFILA2 ready_low, ready_medium, ready_high, executing, blocked;
+PFILA2 ready, executing, blocked;
 
-TCB_t *main_tcb = NULL;
 int id_count = 1;
 int thread_main_already_created = 0;
 
 
+/**
+ * Selects the thread that is running and preempt it
+ * @return the status of failure or success
+ */
+int preempt_running_thread() {
+    if (FirstFila2(executing) != 0) {
+        return SUCCESS;
+    } else {
+        TCB_t *executing_thread = GetAtAntIteratorFila2(executing);
+        //TODO: unblock the thread that was waiting for the semaphore
+        //free_blocked_thread(executing_thread->tid)
+        // depends on unlocked threads
+        remove_thread_from_queue(executing, executing_thread->id);
+        free(executing_thread);
+        return SUCCESS;
+    }
+}
+
+/**
+ * If there is a thread to be executed, it will set the context and deal with the queues
+ * @return: return if everything was ok
+ */
+int schedule_next_thread() {
+    TCB_t *thread = select_next_thread();
+
+    if (thread != NULL) {
+        remove_thread_from_queue(ready); // generalize for one queue
+        AppendFila2(executing, thread);
+        setcontext(&(thread->context));
+        return SUCCESS;
+    } else {
+        return NOTHING_TO_SCHEDULE;
+    }
+}
+
 /*
- * TODO
  * Handle the thread termination
  * is used as a callback for the makecontext function
  */
 int handle_termination() {
-	return 0;
+    preempt_running_thread();
+    return schedule_next_thread();
 }
 
 /*
@@ -65,7 +100,7 @@ int initialize_main_thread() {
     main_thread->tid = MAIN_TID;
     main_thread->prio = LOW_PRIO;
 
-    if (AppendFila2(&ready_low, main_thread) == SUCCESS) {
+    if (AppendFila2(ready, main_thread) == SUCCESS) {
         thread_main_already_created = 1;
         return SUCCESS;
     } else {
@@ -102,16 +137,12 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     create_context(&(tcb->context), current_context); // here is tricky, when the thread context is finished, it points to the current context (callback)
     makecontext(&(tcb->context), (void (*) (void)) start, 1, arg);
 
-    // adding the tcb to the priority queue
+    // adding the tcb to the ready queue with priority verification
     switch (prio){
         case HIGH_PRIO:
-            AppendFila2(&ready_high, tcb);
-            break;
         case MEDIUM_PRIO:
-            AppendFila2(&ready_medium, tcb);
-            break;
         case LOW_PRIO:
-            AppendFila2(&ready_low, tcb);
+            AppendFila2(ready, tcb);
             break;
         default:
             return ERROR_PRIO_NOT_DEFINED;

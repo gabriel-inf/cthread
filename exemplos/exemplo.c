@@ -32,64 +32,10 @@ void* func1(void *arg) {
     return 0;
 }*/
 
-
-int inicia(csem_t *sem, int count) {
-
-	PFILA2 pfila = malloc(sizeof(FILA2));
-	 
-	sem->count = count;
-	sem->fila = pfila;
-	
-	if (CreateFila2(pfila) == SUCCESS_CODE) {
-		return SUCCESS_CODE;
-	} else {
-		return ERROR_CODE;
-	}
-}
-
-int espera(csem_t *sem) {
-
-	sem->count --;
-	if (sem->count < 0) {
-
-		if (executing == NULL) return ERROR_CODE;
-		if (sem->fila == NULL) return ERROR_CODE;
-
-		if ( FirstFila2(executing) != SUCCESS_CODE ) return ERROR_CODE;
-		TCB_t *executing_process = (TCB_t *)executing->first->node;
-		executing_process->state = PROCST_BLOQ;
-
-		if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return ERROR_CODE;
-		if (AppendFila2(sem->fila, &executing_process) != SUCCESS_CODE) return ERROR_CODE;
-
-	}
-	return SUCCESS_CODE;
-}
-
-int sinal(csem_t *sem) {
-
-	sem->count ++;
-	if (sem->count <= 0) {
-
-		if (sem->fila == NULL) return ERROR_CODE;
-		if (ready == NULL) return ERROR_CODE;
-
-		TCB_t *process_to_wake = (TCB_t *) sem->fila->first->node;
-		process_to_wake->state = PROCST_APTO;
-		if (FirstFila2(sem->fila) != SUCCESS_CODE) return ERROR_CODE;
-		if (DeleteAtIteratorFila2(sem->fila) != SUCCESS_CODE) return ERROR_CODE;
-		if (AppendFila2(ready, &process_to_wake) != SUCCESS_CODE) return ERROR_CODE;
-
-	}
-
-	return SUCCESS_CODE;
-
-}
-
 int test_csem_init(int test_sem_count) {
 
 	csem_t *semaphore = malloc(sizeof(csem_t));
-	if (inicia(semaphore, test_sem_count) != SUCCESS_CODE) return ERROR_CODE;
+	if (csem_init(semaphore, test_sem_count) != SUCCESS_CODE) return ERROR_CODE;
 	if (semaphore->count != test_sem_count) return ERROR_CODE;
 	if (semaphore->fila == NULL) return ERROR_CODE;
 	if (FirstFila2(semaphore->fila) == SUCCESS_CODE) return ERROR_CODE; //assert fila sem item
@@ -107,12 +53,12 @@ int test_cwait_count_smaller() {
 	tcb_teste->context = test_context;
 
 	csem_t *semaphore = malloc(sizeof(csem_t));
-	if (inicia(semaphore, -10) != SUCCESS_CODE) return ERROR_CODE;
+	if (csem_init(semaphore, -10) != SUCCESS_CODE) return ERROR_CODE;
 
 	executing = malloc(sizeof(FILA2));
 	if (CreateFila2(executing) != SUCCESS_CODE) return ERROR_CODE;
 	if (AppendFila2(executing, (void *)tcb_teste) != SUCCESS_CODE) return ERROR_CODE;
-	if (espera(semaphore) != SUCCESS_CODE) return ERROR_CODE;
+	if (cwait(semaphore) != SUCCESS_CODE) return ERROR_CODE;
 	
 	if (semaphore->count != -11) return ERROR_CODE;
 
@@ -134,12 +80,12 @@ int test_cwait_count_greater() {
 	tcb_teste->context = test_context;
 
 	csem_t *semaphore = malloc(sizeof(csem_t));
-	if (inicia(semaphore, 10) != SUCCESS_CODE) return ERROR_CODE;
+	if (csem_init(semaphore, 10) != SUCCESS_CODE) return ERROR_CODE;
 
 	executing = malloc(sizeof(FILA2));
 	if (CreateFila2(executing) != SUCCESS_CODE) return ERROR_CODE;
 	if (AppendFila2(executing, (void *)tcb_teste) != SUCCESS_CODE) return ERROR_CODE;
-	if (espera(semaphore) != SUCCESS_CODE) return ERROR_CODE;
+	if (cwait(semaphore) != SUCCESS_CODE) return ERROR_CODE;
 	
 	if (semaphore->count != 9) return ERROR_CODE;
 
@@ -161,13 +107,13 @@ int test_csignal_count_smaller() {
 	tcb_teste->context = test_context;
 
 	csem_t *semaphore = malloc(sizeof(csem_t));
-	if (inicia(semaphore, -10) != SUCCESS_CODE) return ERROR_CODE;
+	if (csem_init(semaphore, -10) != SUCCESS_CODE) return ERROR_CODE;
 
 	ready = malloc(sizeof(FILA2));
 	if (CreateFila2(ready) != SUCCESS_CODE) return ERROR_CODE;
 
 	if (AppendFila2(semaphore->fila, (void *)tcb_teste) != SUCCESS_CODE) return ERROR_CODE;
-	if (sinal(semaphore) != SUCCESS_CODE) return ERROR_CODE;
+	if (csignal(semaphore) != SUCCESS_CODE) return ERROR_CODE;
 
 	if (semaphore->count != -9) return ERROR_CODE;
 	if (tcb_teste->state != PROCST_APTO) return ERROR_CODE;
@@ -189,13 +135,13 @@ int test_csignal_count_greater() {
 	tcb_teste->context = test_context;
 
 	csem_t *semaphore = malloc(sizeof(csem_t));
-	if (inicia(semaphore, 10) != SUCCESS_CODE) return ERROR_CODE;
+	if (csem_init(semaphore, 10) != SUCCESS_CODE) return ERROR_CODE;
 
 	ready = malloc(sizeof(FILA2));;
 	if (CreateFila2(ready) != SUCCESS_CODE) return ERROR_CODE;
 
 	if (AppendFila2(semaphore->fila, (void *)tcb_teste) != SUCCESS_CODE) return ERROR_CODE;
-	if (sinal(semaphore) != SUCCESS_CODE) return ERROR_CODE;
+	if (csignal(semaphore) != SUCCESS_CODE) return ERROR_CODE;
 
 	if (semaphore->count != 11) return ERROR_CODE;
 	if (tcb_teste->state != PROCST_BLOQ) return ERROR_CODE;

@@ -22,9 +22,9 @@ cthread:
 	$(CC) -o $(BIN_DIR)/cthread.o $(SRC_DIR)/cthread.c
 
 libcthread:
-    ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/cthread.o $(BIN_DIR)/support.o
+	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/cthread.o $(BIN_DIR)/support.o
 
 clean:
-    find $(BIN_DIR)/*.o ! -name 'support.o' -type f -exec rm -f {} +
+	find $(BIN_DIR)/*.o ! -name 'support.o' -type f -exec rm -f {} +
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*~ $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
 

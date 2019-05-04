@@ -74,6 +74,23 @@ void process_execution() {
 void ready_process_execution() {
 
 	printf("execution ready process started\n");
+	
+	assert(ready != NULL);
+	assert(executing != NULL);
+	assert(semaphore_test->fila != NULL);
+	
+	assert(FirstFila2(semaphore_test->fila) == SUCCESS_CODE);
+	
+	
+	TCB_t *waiting_thread = (TCB_t *) semaphore_test->fila->first->node;
+	assert( waiting_thread->tid  == 9);
+	
+	printf("execution ready process started 1\n");
+	
+	assert( ((TCB_t *) executing->first->node)->tid == 10);
+	
+	printf("execution ready process started 2\n");
+	
 	printf("execution ready finishing\n");
 	setcontext(&mcontext);
 
@@ -89,9 +106,11 @@ void test_scheduler_block_thread() {
 	semaphore_test->fila = fila;
 	
 	TCB_t *exec_thread = malloc(sizeof(TCB_t));
+	exec_thread->tid = 9;
 	exec_thread->state = PROCST_EXEC;
 	
 	TCB_t *ready_thread = malloc(sizeof(TCB_t));
+	ready_thread->tid = 10;
 	ready_thread->state = PROCST_APTO;
 	
 	ucontext_t exec_context, ready_context;

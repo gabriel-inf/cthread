@@ -4,15 +4,16 @@
 // LEGAL COLOCAR AS FILAS TODAS AQUI, CERTỌ (INTERROGACAO) (NAO ACHO A INTERROGACAO NO LINUX)
 
 PFILA2 executing, ready;
+ucontext_t mcontext;
 
 /*--------------------------------------------------------------------------------
-Função:	Recebe um semaforo e uma thread e insere essa thread na fila do semaforo.
+Função:	Recebe um semaforo e insere a thread que executa no momento na fila do semaforo.
 Ret:
 	==0, se conseguiu
 	!=0, caso contrário
 --------------------------------------------------------------------------------*/
 
-int scheduler_block_thread(TCB_t *thread, csem_t *sem);
+int scheduler_block_thread(csem_t *sem);
 
 /*--------------------------------------------------------------------------------
 Função:	Recebe um semaforo e libera a primeira das threads que espera em sua fila.

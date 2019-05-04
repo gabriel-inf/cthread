@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <ucontext.h>
 
-int scheduler_block_thread(TCB_t *thread, csem_t *sem) {
+int scheduler_block_thread(csem_t *sem) {
 
 
 	if (executing == NULL) return NULL_POINTER;
@@ -26,8 +26,9 @@ int scheduler_block_thread(TCB_t *thread, csem_t *sem) {
 	TCB_t *next = malloc(sizeof(TCB_t));
 	if (scheduler_get_first_ready_thread( &next ) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 	
-	if (swapcontext(&executing_thread->context, &next->context ) != SUCCESS_CODE) return CONTEXT_ERROR;
-	
+	printf("swap started\n");
+	if (swapcontext(&(executing_thread->context), &(next->context) ) != SUCCESS_CODE) return CONTEXT_ERROR;
+	printf("swap finished\n");
 
 	return SUCCESS_CODE;
 

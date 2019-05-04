@@ -26,7 +26,6 @@ PFILA2 ready, executing, blocked;
 int id_count = 1;
 int thread_main_already_created = 0;
 
-
 /**
  * Selects the thread that is running and preempt it
  * @return the status of failure or success
@@ -37,7 +36,7 @@ int preempt_running_thread() {
     } else {
         TCB_t *executing_thread = GetAtAntIteratorFila2(executing);
         //TODO: unblock the thread that was waiting for the semaphore
-        //free_blocked_thread(executing_thread->tid)
+        // free_blocked_thread(executing_thread->tid) // blocked by join (Rodrigo)
         // depends on unlocked threads
         remove_thread_from_queue(executing, executing_thread->id);
         free(executing_thread);
@@ -107,7 +106,6 @@ int initialize_main_thread() {
     } else {
         return FAILED;
     }
-
 }
 
 /**

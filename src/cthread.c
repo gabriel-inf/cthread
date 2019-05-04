@@ -8,11 +8,6 @@
 #include "../include/error.h"
 #include "../include/scheduler.h"
 
-// Priorities
-#define LOW_PRIO 0
-#define MEDIUM_PRIO 1
-#define HIGH_PRIO 2
-
 // Other important constants
 #define MAIN_TID 0
 

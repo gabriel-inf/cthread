@@ -40,7 +40,7 @@ void test_scheduler_block_thread() {
 
 
 }*/
-
+/*
 void test_scheduler_get_first_ready_thread() {
 
 	ready = malloc(sizeof(FILA2));	
@@ -95,7 +95,8 @@ void ready_process_execution() {
 	setcontext(&mcontext);
 
 }
-
+*/
+/*
 void test_scheduler_block_thread() {
 
 	semaphore_test = malloc(sizeof(csem_t));
@@ -133,8 +134,8 @@ void test_scheduler_block_thread() {
 	
 	swapcontext(&mcontext ,&exec_context);
 	
-}
-
+}*/
+/*
 void test_scheduler_free_thread() {
 
 	csem_t *sem = malloc(sizeof(csem_t));
@@ -157,11 +158,87 @@ void test_scheduler_free_thread() {
 	assert(FirstFila2(ready) == SUCCESS_CODE);
 	assert(thread->state == PROCST_APTO);
 
+}*/
+
+void test_scheduler_get_first_ready_thread1() {
+
+	TCB_t *next = NULL;
+	
+	int result = scheduler_get_first_ready_thread(&next);
+	
+	assert(result == -3);
+
+}
+
+void test_scheduler_get_first_ready_thread2() {
+
+	ready_high = malloc(sizeof(FILA2));
+	ready_medium = malloc(sizeof(FILA2));
+	ready_low = malloc(sizeof(FILA2));
+	
+	assert(ready_high != NULL);
+	assert(ready_medium != NULL);
+	assert(ready_low != NULL);
+	
+	TCB_t *next = malloc(sizeof(TCB_t));
+
+	printf("dksandkan k  = %d\n", scheduler_get_first_ready_thread(&next));
+
+	assert(scheduler_get_first_ready_thread(&next) == NOTHING_TO_SCHEDULE);
+
+}
+
+void test_scheduler_get_first_ready_thread3() {
+
+	ready_high = malloc(sizeof(FILA2));
+	ready_medium = malloc(sizeof(FILA2));
+	ready_low = malloc(sizeof(FILA2));
+	
+	TCB_t *next = malloc(sizeof(TCB_t));
+	
+	TCB_t *thread_high = malloc(sizeof(TCB_t));
+	thread_high->tid = 10;
+	thread_high->prio = 0;
+	
+	TCB_t *thread_med = malloc(sizeof(TCB_t));
+	thread_med->tid = 9;
+	thread_med->prio = 1;
+	
+	assert( (AppendFila2(ready_high, (void *)thread_high) == SUCCESS_CODE ));
+	assert( (AppendFila2(ready_medium, (void *)thread_med) == SUCCESS_CODE ));
+
+	assert(scheduler_get_first_ready_thread(&next) == SUCCESS_CODE);
+	
+	assert(next->tid == 10);
+
+}
+
+void test_scheduler_get_first_ready_thread4() {
+
+	ready_high = NULL;
+	ready_medium = NULL;
+	ready_low = malloc(sizeof(FILA2));
+	
+	TCB_t *next = malloc(sizeof(TCB_t));
+	
+	TCB_t *thread_low = malloc(sizeof(TCB_t));
+	thread_low->tid = 90;
+	thread_low->prio = 1;
+	
+	assert( (AppendFila2(ready_low, (void *)thread_low) == SUCCESS_CODE ));
+
+	assert(scheduler_get_first_ready_thread(&next) == SUCCESS_CODE);
+	
+	assert(next->tid == 90);
+
 }
 
 int main(int argc, char *argv[]) {
 
-	test_scheduler_block_thread();
+	test_scheduler_get_first_ready_thread1();
+	test_scheduler_get_first_ready_thread2();
+	test_scheduler_get_first_ready_thread3();
+	test_scheduler_get_first_ready_thread4();
 	return 0;
 }
 

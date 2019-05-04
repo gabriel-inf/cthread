@@ -58,22 +58,21 @@ int scheduler_free_thread(csem_t *sem) {
 
 int scheduler_get_first_ready_thread( TCB_t** next ) {
 	
-	if ( ready_high == NULL ) return NULL_POINTER;
-	if ( next == NULL ) return NULL_POINTER;
+	if ( *next == NULL ) return NULL_POINTER;
 	
-	if ( FirstFila2(ready_high) == SUCCESS_CODE ) {
+	if ( ( ready_high != NULL ) && (FirstFila2(ready_high) == SUCCESS_CODE) ) {
 	
-		*next = ready_high->first->node;
+		*next = (TCB_t *) ready_high->first->node;
 		return SUCCESS_CODE;
 	
 	} else if ((ready_medium != NULL) && ( FirstFila2(ready_medium) == SUCCESS_CODE )) { 
 	
-		*next = ready_medium->first->node;
+		*next = (TCB_t *) ready_medium->first->node;
 		return SUCCESS_CODE;
 	
 	} else if ((ready_low != NULL) && ( FirstFila2(ready_low) == SUCCESS_CODE )) {
 	
-		*next = ready_low->first->node;
+		*next = (TCB_t *) ready_low->first->node;
 		return SUCCESS_CODE;
 	
 	} else {
@@ -131,23 +130,38 @@ int scheduler_schedule_next_thread() {
     // TENHO UMA DUVIDA NESSA: ao inves de chamarmos setcontext, nao deveriamos chamar swapcontext (interrogacao) tipo,
     // nao deveriamos salvar o atual em algum lugar (int)
     // o set context nem retorna se deu sucesso e retorna -1 se deu erro, 
-    //entao faz sentido colocar um return success_code apos sua chamada (interrogacao)
+    // entao faz sentido colocar um return success_code apos sua chamada (interrogacao)
    
 }
 
+/*
+int scheduler_remove_thread_from_exec() {
+
+	if (executing == NULL) return NULL_POINTER;
+	if (FirstFila2(executing) != SUCCESS_CODE) return EMPTY_LINE;
+
+	TCB_t *executing_thread = (TCB_t *)executing->first->node;
+	
+	executing_thread->
+	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;	
+	
+	return getcontext(&(executing_thread->context);
+	
+}*/
 
 int scheduler_insert_in_ready(TCB_t *thread) {
-	
-	if (ready == NULL) return NULL_POINTER;
 	
 	int prio = thread->prio;
 	
 	switch (prio) {
         case HIGH_PRIO:
+        	if (ready_high == NULL) return NULL_POINTER;
         	return AppendFila2(ready_high, (void *) thread);
         case MEDIUM_PRIO:
+        	if (ready_medium == NULL) return NULL_POINTER;
         	return AppendFila2(ready_medium, (void *) thread);
         case LOW_PRIO:
+        	if (ready_low == NULL) return NULL_POINTER;
             return AppendFila2(ready_low, (void *) thread);
         default:
             return ERROR_PRIO_NOT_DEFINED;

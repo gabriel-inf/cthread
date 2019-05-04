@@ -1,9 +1,7 @@
 #ifndef	__SCHEDULER_H__
 #define	__SCHEDULER_H__
 
-// LEGAL COLOCAR AS FILAS TODAS AQUI, CERTỌ (INTERROGACAO) (NAO ACHO A INTERROGACAO NO LINUX)
-
-PFILA2 executing, ready;
+PFILA2 executing, ready_low, ready_medium, ready_high;
 ucontext_t mcontext;
 
 /*--------------------------------------------------------------------------------

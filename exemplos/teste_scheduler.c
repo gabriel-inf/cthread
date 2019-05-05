@@ -61,7 +61,7 @@ void test_scheduler_get_first_ready_thread() {
 
 void test_scheduler_insert_in_ready() {
 
-}
+}*/
 
 void process_execution() {
 
@@ -75,7 +75,8 @@ void ready_process_execution() {
 
 	printf("execution ready process started\n");
 	
-	assert(ready != NULL);
+	assert(ready_medium != NULL);
+	assert(FirstFila2(ready_medium) != SUCCESS_CODE);
 	assert(executing != NULL);
 	assert(semaphore_test->fila != NULL);
 	
@@ -83,26 +84,25 @@ void ready_process_execution() {
 	
 	
 	TCB_t *waiting_thread = (TCB_t *) semaphore_test->fila->first->node;
-	assert( waiting_thread->tid  == 9);
-	
-	printf("execution ready process started 1\n");
+	assert( waiting_thread->tid == 9);
+	assert( waiting_thread->state == PROCST_BLOQ);
 	
 	assert( ((TCB_t *) executing->first->node)->tid == 10);
+	assert( ((TCB_t *) executing->first->node)->state == PROCST_EXEC );
 	
-	printf("execution ready process started 2\n");
 	
 	printf("execution ready finishing\n");
 	setcontext(&mcontext);
 
 }
-*/
-/*
+
+
 void test_scheduler_block_thread() {
 
 	semaphore_test = malloc(sizeof(csem_t));
 	PFILA2 fila = malloc(sizeof(FILA2));
 	executing = malloc(sizeof(FILA2));
-	ready = malloc(sizeof(FILA2));
+	ready_medium = malloc(sizeof(FILA2));
 
 	semaphore_test->fila = fila;
 	
@@ -113,16 +113,23 @@ void test_scheduler_block_thread() {
 	TCB_t *ready_thread = malloc(sizeof(TCB_t));
 	ready_thread->tid = 10;
 	ready_thread->state = PROCST_APTO;
+	ready_thread->prio = MEDIUM_PRIO;
 	
 	ucontext_t exec_context, ready_context;
 	
-	getcontext(&exec_context);
-	exec_context.uc_stack.ss_sp = (char *)malloc(SIGSTKSZ);
+	assert (getcontext(&exec_context) != FAILED);
+	char *pilha = (char *)malloc(SIGSTKSZ);
+	assert (pilha != NULL);
+	
+	exec_context.uc_stack.ss_sp = pilha;
 	exec_context.uc_stack.ss_size = SIGSTKSZ;
 	makecontext(&exec_context, process_execution, 0);
 	
-	getcontext(&ready_context);
-	ready_context.uc_stack.ss_sp = (char *)malloc(SIGSTKSZ);
+	assert (getcontext(&ready_context) != FAILED);
+	char *pilha2 = (char *)malloc(SIGSTKSZ);
+	assert (pilha2 != NULL);
+	
+	ready_context.uc_stack.ss_sp = pilha2;
 	ready_context.uc_stack.ss_size = SIGSTKSZ;
 	makecontext(&ready_context, ready_process_execution, 0);
 	
@@ -130,11 +137,11 @@ void test_scheduler_block_thread() {
 	ready_thread->context = ready_context;
 	
 	assert(AppendFila2(executing, (void *) exec_thread) == SUCCESS_CODE);
-	assert(AppendFila2(ready, (void *) ready_thread) == SUCCESS_CODE);
+	assert(AppendFila2(ready_medium, (void *) ready_thread) == SUCCESS_CODE);
 	
-	swapcontext(&mcontext ,&exec_context);
+	swapcontext(&mcontext, &exec_context);
 	
-}*/
+}
 /*
 void test_scheduler_free_thread() {
 
@@ -235,10 +242,7 @@ void test_scheduler_get_first_ready_thread4() {
 
 int main(int argc, char *argv[]) {
 
-	test_scheduler_get_first_ready_thread1();
-	test_scheduler_get_first_ready_thread2();
-	test_scheduler_get_first_ready_thread3();
-	test_scheduler_get_first_ready_thread4();
+	test_scheduler_block_thread();
 	return 0;
 }
 

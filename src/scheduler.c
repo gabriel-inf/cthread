@@ -22,17 +22,20 @@ int scheduler_block_thread(csem_t *sem) {
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;		
 	if (AppendFila2(sem->fila, (void *)executing_thread)) return LINE_OPERATION_ERROR;
 	
-	
-	TCB_t *next = malloc(sizeof(TCB_t));
-	if (scheduler_get_first_ready_thread( &next ) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
-	
-	if (AppendFila2(executing, (void *)next)) return LINE_OPERATION_ERROR;
-	
+	//if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
 	printf("swap started\n");
-	if (swapcontext(&(executing_thread->context), &(next->context) ) != SUCCESS_CODE) return CONTEXT_ERROR;
-	printf("swap finished\n");
+	return scheduler_schedule_next_thread();
+	
+	//TCB_t *next = malloc(sizeof(TCB_t));
+	//if (scheduler_get_first_ready_thread( &next ) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+	
+	//if (AppendFila2(executing, (void *)next)) return LINE_OPERATION_ERROR;
+	
+	
+	//if (swapcontext(&(executing_thread->context), &(next->context) ) != SUCCESS_CODE) return CONTEXT_ERROR;
+	//printf("swap finished\n");
 
-	return SUCCESS_CODE;
+	//return SUCCESS_CODE;
 
 }
 
@@ -81,8 +84,6 @@ int scheduler_get_first_ready_thread( TCB_t** next ) {
 	
 	}
 	
-	//aqui tem a parada de curto circuito, tipo se uma for nula ele retorna antes de executar o resto do if, neam (interrogacao)
-	
 }
 
 /**
@@ -101,31 +102,46 @@ int scheduler_schedule_next_thread() {
     if (next_result != SUCCESS_CODE) return next_result;
 	
 	int prio = next->prio;
+	printf("%d\n", prio);
+	printf("tiddsnkdsnkdsdkn = %d\n", next->tid);
 	
 	switch (prio) {
         case HIGH_PRIO:
         	
         	if (FirstFila2(ready_high) != SUCCESS_CODE) return EMPTY_LINE;
         	if (DeleteAtIteratorFila2(ready_high) != SUCCESS_CODE) return LINE_OPERATION_ERROR;	
-        	if (AppendFila2(executing, (void *) next) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
-        	
+        	break;
         case MEDIUM_PRIO:
-        
+        	printf("laura =\n");
         	if (FirstFila2(ready_medium) != SUCCESS_CODE) return EMPTY_LINE;
+        	printf("laura =\n");
         	if (DeleteAtIteratorFila2(ready_medium) != SUCCESS_CODE) return LINE_OPERATION_ERROR;	
-        	if (AppendFila2(executing, (void *) next) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
-        	
+        	printf("laura =\n");
+        	break;
         case LOW_PRIO:
             if (FirstFila2(ready_low) != SUCCESS_CODE) return EMPTY_LINE;
         	if (DeleteAtIteratorFila2(ready_low) != SUCCESS_CODE) return LINE_OPERATION_ERROR;	
-        	if (AppendFila2(executing, (void *) next) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
-            
+            break;
         default:
             return ERROR_PRIO_NOT_DEFINED;
     }
+    printf("laura =\n");
+    if (FirstFila2(executing) == SUCCESS_CODE) return EMPTY_LINE;
+    printf("eu =\n");
+    next->state = PROCST_EXEC;
+    if (AppendFila2(executing, (void *) next) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+    printf("soccorro =\n");
+    if (&(next->context) == NULL) return FAILED;
+    ucontext_t aa;
+    printf("%d\n", next->context.uc_stack.ss_size);
+    if ( next->context.uc_stack.ss_sp == NULL) return NULL_POINTER; //tem que tratar o error 
     
-    if (setcontext(&(next->context)) == FAILED) return FAILED;
-    return SUCCESS_CODE;
+    printf("vamo\n");
+    return swapcontext(&aa, &(next->context));
+    //printf("%d", setcontext(&(next->context)) );
+    //if (== FAILED) return FAILED;
+    //printf("alooooo\n");
+    //return SUCCESS_CODE;
     
     // TENHO UMA DUVIDA NESSA: ao inves de chamarmos setcontext, nao deveriamos chamar swapcontext (interrogacao) tipo,
     // nao deveriamos salvar o atual em algum lugar (int)
@@ -142,7 +158,7 @@ int scheduler_remove_thread_from_exec() {
 
 	TCB_t *executing_thread = (TCB_t *)executing->first->node;
 	
-	executing_thread->
+	executing_thread->state = 
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;	
 	
 	return getcontext(&(executing_thread->context);

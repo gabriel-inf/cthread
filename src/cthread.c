@@ -21,8 +21,23 @@ int thread_main_already_created = 0;
  * is used as a callback for the makecontext function
  */
 int handle_termination() {
-    if (scheduler_kill_thread_from_exec() != SUCCESS_CODE) return FAILED;
-    return scheduler_schedule_next_thread();
+
+	printf("handle termination");
+    if (scheduler_kill_thread_from_exec() != SUCCESS_CODE) {
+		printf("\n\n\nThis shit failed");
+		return FAILED;
+	}
+	printf("\n\n\ndid not failed\n");
+
+	int resss = scheduler_schedule_next_thread();
+
+	if (resss == SUCCESS_CODE) {
+	printf("\n\n\n 1111 - did not failed \n");
+	} else {
+		printf("\n\n\n 1111 - did not failed \n");
+	}
+
+    return resss;
 }
 
 /*
@@ -47,7 +62,9 @@ int create_context(ucontext_t* context, ucontext_t* next) {
  */
 int initialize_main_thread() {
 
+
     ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
+
 
     create_context(current_context, NULL);
 
@@ -55,12 +72,14 @@ int initialize_main_thread() {
     main_thread->tid = MAIN_TID;
     main_thread->prio = LOW_PRIO;
 
-    if (AppendFila2(ready_low, main_thread) == SUCCESS_CODE) {
-        thread_main_already_created = 1;
-        return SUCCESS_CODE;
-    } else {
-        return FAILED;
-    }
+
+
+	int insertion_result = scheduler_insert_in_ready(main_thread);
+    if (insertion_result != SUCCESS_CODE) return FAILED;
+        
+    thread_main_already_created = 1;
+	return insertion_result;
+
 }
 
 /**
@@ -71,17 +90,20 @@ int initialize_main_thread() {
  * @return returns the thread id or failure code
  */
 int ccreate (void* (*start)(void*), void *arg, int prio) {
-
     // first thing to do is to create the thread main if it is not created
+	initialize_state_queues();
+
     if(!thread_main_already_created) {
         initialize_main_thread();
     }
-    // this is the struct that will have the thread block
+	
+    // this is the structure that will have the thread block
     TCB_t *tcb = (TCB_t *) malloc(sizeof(TCB_t));
 
     tcb->tid = id_count++;
     tcb->state = PROCST_APTO;
     tcb->prio = prio;
+
 
     // this context will be used as callback
     ucontext_t *callback_context = (ucontext_t*) malloc(sizeof(ucontext_t));
@@ -92,11 +114,13 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     makecontext(&(tcb->context), (void (*) (void)) start, 1, arg);
 
     // adding the tcb to the ready queue with priority verification
-    
     int insertion_result = scheduler_insert_in_ready(tcb);
     if ( insertion_result != SUCCESS_CODE) return insertion_result;
+
+	scheduler_schedule_next_thread();
     
     return tcb->tid; 
+	
 }
   
 int csem_init(csem_t *sem, int count) {

@@ -1,9 +1,9 @@
 #ifndef	__SCHEDULER_H__
 #define	__SCHEDULER_H__
 
-#define LOW_PRIO 0
+#define HIGH_PRIO 0
 #define MEDIUM_PRIO 1
-#define HIGH_PRIO 2
+#define LOW_PRIO 2
 
 PFILA2 executing, ready_low, ready_medium, ready_high;
 ucontext_t mcontext;

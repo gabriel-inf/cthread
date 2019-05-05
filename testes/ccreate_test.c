@@ -21,7 +21,7 @@ void* func1(void *arg) {
 	printf("Func1 has been executed lalallalalalala\n");
 	assert( SUCCESS_CODE == csignal(semaphore_test));
 	assert( FirstFila2(semaphore_test->fila) != SUCCESS_CODE);
-	assert( FirstFila2(ready_high) == SUCCESS_CODE);
+	assert( FirstFila2(ready_medium) == SUCCESS_CODE);
 	assert( ((TCB_t *)GetAtIteratorFila2(ready_high))->tid == 2);
 	printf("testes passaram\n");
 	assert(semaphore_test->count == 0);

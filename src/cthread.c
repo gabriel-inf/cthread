@@ -71,21 +71,16 @@ int create_context(ucontext_t* context, ucontext_t* next) {
  */
 int initialize_main_thread() {
 
-
-    ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
-
-
-    create_context(current_context, NULL);
-
     TCB_t *main_thread = malloc(sizeof(TCB_t));
     main_thread->tid = MAIN_TID;
-    main_thread->prio = LOW_PRIO; //cade um ->context = context
+    main_thread->prio = LOW_PRIO;
+	if (create_context(&(main_thread->context), NULL) != SUCCESS_CODE) return FAILED;
 
-
-	int insertion_result = scheduler_insert_in_ready(main_thread);
+	int insertion_result = AppendFila2(executing, (void *) main_thread);
     if (insertion_result != SUCCESS_CODE) return FAILED;
         
     thread_main_already_created = 1;
+
 	return insertion_result;
 
 }
@@ -127,15 +122,28 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     
     if (tcb->context.uc_link == NULL) return FAILED;
 
-    // adding the tcb to the ready queue with priority verification
+    // adding the TCB to the ready queue with priority verification
     int insertion_result = scheduler_insert_in_ready(tcb);
     if ( insertion_result != SUCCESS_CODE) return insertion_result;
-
-	//scheduler_schedule_next_thread();
     
     return tcb->tid; 
 	
 }
+
+int cyield(void) {
+
+	if(!thread_main_already_created) {
+    	initialize_state_queues();
+        initialize_main_thread();
+    }
+
+	int state_migration_result = send_exec_to_ready();
+	if (state_migration_result != SUCCESS_CODE) return state_migration_result;
+
+	return scheduler_schedule_next_thread();
+
+}
+
   
 int csem_init(csem_t *sem, int count) {
 

@@ -12,7 +12,7 @@ TEST_DIR=../testes
 all: ccreate_test
 
 ccreate_test: ccreate_test.c $(LIB_DIR)/libcthread.a
-	$(CC) -o $(TEST_BIN_DIR)/ccreate_test.o ccreate_test.c -L$(LIB_DIR) -lcthread -Wall
+	$(CC) -o $(TEST_BIN_DIR)/ccreate_test.o ccreate_test0.c -L$(LIB_DIR) -lcthread -Wall
 
 clean:
 	rm -rf $(TEST_BIN_DIR)/*.o *~

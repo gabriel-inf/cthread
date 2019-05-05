@@ -186,6 +186,26 @@ int scheduler_kill_thread_from_exec() {
 	
 }
 
+int send_exec_to_ready() {
+
+	if (executing == NULL) return NULL_POINTER;
+	if (FirstFila2(executing) != SUCCESS_CODE) return EMPTY_LINE;
+
+	TCB_t *executing_thread = (TCB_t *) GetAtIteratorFila2(executing);
+	
+	executing_thread->state = PROCST_APTO;
+	
+	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+
+	int insert_ready_result = scheduler_insert_in_ready(&executing_thread);
+	if (insert_ready_result != SUCCESS_CODE) return insert_ready_result;	
+	show_state_queues();
+	printf("\nTid=%d, Tprio=%d\n", executing_thread->tid, executing_thread->prio);
+	return scheduler_insert_in_ready(&executing_thread);
+	
+}
+
+
 int scheduler_insert_in_ready(TCB_t *thread) {
 
 	int prio = thread->prio;

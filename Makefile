@@ -15,16 +15,24 @@ LIB_DIR=./lib
 INC_DIR=./include
 BIN_DIR=./bin
 SRC_DIR=./src
+SRC_EXP=./exemplos
 
 all: cthread libcthread
 
 cthread:
-	$(CC) -o $(BIN_DIR)/cthread.o $(SRC_DIR)/cthread.c
+	$(CC) -c $(SRC_DIR)/cthread.c -o $(BIN_DIR)/cthread.o
+
+scheduler:
+	$(CC) -c $(SRC_DIR)/scheduler.c -o $(BIN_DIR)/scheduler.o
 
 libcthread:
-    ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/cthread.o $(BIN_DIR)/support.o
+	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/cthread.o $(BIN_DIR)/support.o
 
 clean:
-    find $(BIN_DIR)/*.o ! -name 'support.o' -type f -exec rm -f {} +
+	find $(BIN_DIR)/*.o ! -name 'support.o' -type f -exec rm -f {} +
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*~ $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
 
+linker:
+	$(CC) -c $(SRC_DIR)/cthread.c -o $(BIN_DIR)/cthread.o
+	$(CC) -c $(SRC_DIR)/scheduler.c -o $(BIN_DIR)/scheduler.o
+	$(CC) -o $(SRC_EXP)/teste_scheduleia $(SRC_EXP)/teste_scheduler.c $(BIN_DIR)/support.o $(BIN_DIR)/scheduler.o $(BIN_DIR)/cthread.o

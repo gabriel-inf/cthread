@@ -5,6 +5,7 @@
 CC=gcc
 LIB_DIR=../lib
 SRC_DIR=../src
+BIN_DIR=../bin
 
 all: exemplo mandel teste_vetor barbeiro filosofos prodcons series
 
@@ -31,7 +32,7 @@ series: series.c $(LIB_DIR)/libcthread.a
 	
 library:
 	$(CC) -o $(SRC_DIR)/lib.o -c $(SRC_DIR)/lib.c
-	ar -rsc $(LIB_DIR)/libcthread.a $(SRC_DIR)/lib.o
+	ar -rsc $(LIB_DIR)/libcthread.a $(SRC_DIR)/lib.o $(BIN_DIR)/support.o
 
 clean:
 	rm -rf exemplo mandel teste_vetor barbeiro filosofos prodcons series *.o *~

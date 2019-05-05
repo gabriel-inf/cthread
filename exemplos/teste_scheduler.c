@@ -82,14 +82,12 @@ void ready_process_execution() {
 	
 	assert(FirstFila2(semaphore_test->fila) == SUCCESS_CODE);
 	
-	
 	TCB_t *waiting_thread = (TCB_t *) semaphore_test->fila->first->node;
 	assert( waiting_thread->tid == 9);
 	assert( waiting_thread->state == PROCST_BLOQ);
 	
 	assert( ((TCB_t *) executing->first->node)->tid == 10);
 	assert( ((TCB_t *) executing->first->node)->state == PROCST_EXEC );
-	
 	
 	printf("execution ready finishing\n");
 	setcontext(&mcontext);
@@ -188,8 +186,6 @@ void test_scheduler_get_first_ready_thread2() {
 	assert(ready_low != NULL);
 	
 	TCB_t *next = malloc(sizeof(TCB_t));
-
-	printf("dksandkan k  = %d\n", scheduler_get_first_ready_thread(&next));
 
 	assert(scheduler_get_first_ready_thread(&next) == NOTHING_TO_SCHEDULE);
 

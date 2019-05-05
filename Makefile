@@ -15,11 +15,15 @@ LIB_DIR=./lib
 INC_DIR=./include
 BIN_DIR=./bin
 SRC_DIR=./src
+SRC_EXP=./exemplos
 
 all: cthread libcthread
 
 cthread:
 	$(CC) -o $(BIN_DIR)/cthread.o $(SRC_DIR)/cthread.c
+
+scheduler:
+	$(CC) -o $(BIN_DIR)/scheduler.o $(SRC_DIR)/scheduler.c
 
 libcthread:
 	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/cthread.o $(BIN_DIR)/support.o
@@ -28,3 +32,5 @@ clean:
 	find $(BIN_DIR)/*.o ! -name 'support.o' -type f -exec rm -f {} +
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*~ $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
 
+linker:
+	$(CC) -o $(SRC_EXP)/teste_mandela $(SRC_EXP)/mandel.c $(BIN_DIR)/support.o $(BIN_DIR)/scheduler.o $(BIN_DIR)/cthread.o

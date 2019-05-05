@@ -145,3 +145,16 @@ int csignal(csem_t *sem) {
 
     return SUCCESS_CODE;
 }
+
+int csetprio(int tid, int prio) {
+    // First thing to do is to create the thread main if it is not created
+    int init_main_result = initialize_main_thread();
+    if (init_main_result != SUCCESS_CODE) return  init_main_result;
+
+    TCB_t *executing_thread = scheduler_get_executing_thread();
+    if (executing_thread == NULL) return NULL_POINTER;
+
+    executing_thread->prio = prio;
+
+    return SUCCESS_CODE;
+}

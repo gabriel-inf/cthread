@@ -19,7 +19,7 @@ int thread_main_already_created = 0;
  * Selects the thread that is running and preempt it
  * @return the status of failure or success
  */
-int preempt_running_thread() {
+int kill_running_thread() {
     if (FirstFila2(executing) != 0) {
         return SUCCESS_CODE;
     } else {
@@ -38,7 +38,7 @@ int preempt_running_thread() {
  * is used as a callback for the makecontext function
  */
 int handle_termination() {
-    preempt_running_thread();
+    kill_running_thread();
     return schedule_next_thread();
 }
 
@@ -110,11 +110,10 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
 
     // adding the tcb to the ready queue with priority verification
     
-    
     int insertion_result = scheduler_insert_in_ready(tcb);
     if ( insertion_result != SUCCESS_CODE) return insertion_result;
     
-    return tcb->tid; //GABIII AQUI NAO DEVERIA RETORNAR SUCCESS_CODE, COMO DIZ NA DEFINICAO DA FUNC 
+    return tcb->tid; 
 }
   
 int csem_init(csem_t *sem, int count) {

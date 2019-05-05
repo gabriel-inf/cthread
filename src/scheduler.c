@@ -23,7 +23,6 @@ int scheduler_block_thread(csem_t *sem) {
 	if (AppendFila2(sem->fila, (void *)executing_thread)) return LINE_OPERATION_ERROR;
 	
 	//if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
-	printf("swap started\n");
 	return scheduler_schedule_next_thread();
 	
 	//TCB_t *next = malloc(sizeof(TCB_t));
@@ -75,7 +74,7 @@ int scheduler_get_first_ready_thread( TCB_t** next ) {
 	
 	} else if ((ready_low != NULL) && ( FirstFila2(ready_low) == SUCCESS_CODE )) {
 	
-		*next = (TCB_t *) ready_low->first->node;
+		*next = (TCB_t *) ready_low->first->node; //mudar pra func do sor
 		return SUCCESS_CODE;
 	
 	} else {
@@ -102,8 +101,6 @@ int scheduler_schedule_next_thread() {
     if (next_result != SUCCESS_CODE) return next_result;
 	
 	int prio = next->prio;
-	printf("%d\n", prio);
-	printf("tiddsnkdsnkdsdkn = %d\n", next->tid);
 	
 	switch (prio) {
         case HIGH_PRIO:
@@ -111,42 +108,32 @@ int scheduler_schedule_next_thread() {
         	if (FirstFila2(ready_high) != SUCCESS_CODE) return EMPTY_LINE;
         	if (DeleteAtIteratorFila2(ready_high) != SUCCESS_CODE) return LINE_OPERATION_ERROR;	
         	break;
+        	
         case MEDIUM_PRIO:
-        	printf("laura =\n");
+        	
         	if (FirstFila2(ready_medium) != SUCCESS_CODE) return EMPTY_LINE;
-        	printf("laura =\n");
         	if (DeleteAtIteratorFila2(ready_medium) != SUCCESS_CODE) return LINE_OPERATION_ERROR;	
-        	printf("laura =\n");
         	break;
+        	
         case LOW_PRIO:
+        
             if (FirstFila2(ready_low) != SUCCESS_CODE) return EMPTY_LINE;
         	if (DeleteAtIteratorFila2(ready_low) != SUCCESS_CODE) return LINE_OPERATION_ERROR;	
             break;
+            
         default:
             return ERROR_PRIO_NOT_DEFINED;
     }
-    printf("laura =\n");
-    if (FirstFila2(executing) == SUCCESS_CODE) return EMPTY_LINE;
-    printf("eu =\n");
+    
     next->state = PROCST_EXEC;
     if (AppendFila2(executing, (void *) next) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
-    printf("soccorro =\n");
     if (&(next->context) == NULL) return FAILED;
     ucontext_t aa;
-    printf("%d\n", next->context.uc_stack.ss_size);
-    if ( next->context.uc_stack.ss_sp == NULL) return NULL_POINTER; //tem que tratar o error 
-    
-    printf("vamo\n");
+    if ( next->context.uc_stack.ss_sp == NULL) return NULL_POINTER;
+
     return swapcontext(&aa, &(next->context));
-    //printf("%d", setcontext(&(next->context)) );
-    //if (== FAILED) return FAILED;
-    //printf("alooooo\n");
-    //return SUCCESS_CODE;
     
-    // TENHO UMA DUVIDA NESSA: ao inves de chamarmos setcontext, nao deveriamos chamar swapcontext (interrogacao) tipo,
-    // nao deveriamos salvar o atual em algum lugar (int)
-    // o set context nem retorna se deu sucesso e retorna -1 se deu erro, 
-    // entao faz sentido colocar um return success_code apos sua chamada (interrogacao)
+    // ta certo esse retorno (interrogacao). Se cair em algum erro ta dando segfault
    
 }
 

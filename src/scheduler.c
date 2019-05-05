@@ -22,7 +22,7 @@ int scheduler_block_thread(csem_t *sem) {
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;		
 	if (AppendFila2(sem->fila, (void *)executing_thread)) return LINE_OPERATION_ERROR;
 	
-	//if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
+	if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
 	return scheduler_schedule_next_thread();
 	
 	//TCB_t *next = malloc(sizeof(TCB_t));
@@ -128,29 +128,28 @@ int scheduler_schedule_next_thread() {
     next->state = PROCST_EXEC;
     if (AppendFila2(executing, (void *) next) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
     if (&(next->context) == NULL) return FAILED;
-    ucontext_t aa;
-    if ( next->context.uc_stack.ss_sp == NULL) return NULL_POINTER;
-
-    return swapcontext(&aa, &(next->context));
     
-    // ta certo esse retorno (interrogacao). Se cair em algum erro ta dando segfault
-   
+    if ( next->context.uc_stack.ss_sp == NULL) return NULL_POINTER;
+    return setcontext(&(next->context));
+
 }
 
-/*
-int scheduler_remove_thread_from_exec() {
+int scheduler_kill_thread_from_exec() {
 
 	if (executing == NULL) return NULL_POINTER;
 	if (FirstFila2(executing) != SUCCESS_CODE) return EMPTY_LINE;
 
-	TCB_t *executing_thread = (TCB_t *)executing->first->node;
+	TCB_t *executing_thread = (TCB_t *) GetAtIteratorFila2(executing);
 	
-	executing_thread->state = 
-	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;	
+	executing_thread->state = PROCST_TERMINO;
+
+	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+
+	free(executing_thread); //Laura does not have sure
 	
-	return getcontext(&(executing_thread->context);
+	return SUCCESS_CODE;
 	
-}*/
+}
 
 int scheduler_insert_in_ready(TCB_t *thread) {
 	

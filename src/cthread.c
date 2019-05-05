@@ -15,31 +15,14 @@
 int id_count = 1;
 int thread_main_already_created = 0;
 
-/**
- * Selects the thread that is running and preempt it
- * @return the status of failure or success
- */
-int kill_running_thread() {
-    if (FirstFila2(executing) != 0) {
-        return SUCCESS_CODE;
-    } else {
-        TCB_t *executing_thread = GetAtAntIteratorFila2(executing);
-        //TODO: unblock the thread that was waiting for the semaphore
-        // free_blocked_thread(executing_thread->tid) // blocked by join (Rodrigo)
-        // depends on unlocked threads
-        remove_thread_from_queue(executing, executing_thread->tid);
-        free(executing_thread);
-        return SUCCESS_CODE;
-    }
-}
 
 /*
  * Handle the thread termination
  * is used as a callback for the makecontext function
  */
 int handle_termination() {
-    kill_running_thread();
-    return schedule_next_thread();
+    if (scheduler_kill_thread_from_exec() != SUCCESS_CODE) return FAILED;
+    return scheduler_schedule_next_thread();
 }
 
 /*
@@ -85,7 +68,7 @@ int initialize_main_thread() {
  * @param start: pointer for the function that will be executed
  * @param arg: arguments for the function
  * @param prio: thread priority
- * @return returns a code of SUCCESS or failure
+ * @return returns the thread id or failure code
  */
 int ccreate (void* (*start)(void*), void *arg, int prio) {
 
@@ -101,11 +84,11 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     tcb->prio = prio;
 
     // this context will be used as callback
-    ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
-    create_context(current_context, NULL);
-    makecontext(current_context, (void (*) (void)) handle_termination, 0); // when called, the current_context will execute the handle_termination function
+    ucontext_t *callback_context = (ucontext_t*) malloc(sizeof(ucontext_t));
+    create_context(callback_context, NULL);
+    makecontext(callback_context, (void (*) (void)) handle_termination, 0); // when called, the callback_context will execute the handle_termination function
 
-    create_context(&(tcb->context), current_context); // here is tricky, when the thread context is finished, it points to the current context (callback)
+    create_context(&(tcb->context), callback_context); // here is tricky, when the thread context is finished, it points to the current context (callback)
     makecontext(&(tcb->context), (void (*) (void)) start, 1, arg);
 
     // adding the tcb to the ready queue with priority verification

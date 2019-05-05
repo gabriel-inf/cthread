@@ -41,11 +41,13 @@ int create_context(ucontext_t* context, ucontext_t* next) {
     return SUCCESS_CODE;
 }
 
-/*
- *  Initializes the main thread
+/**
+ *  Initializes the main thread, should be called at the start of every main lib function
  *  returns 0 if succeeded and -1 if failed
  */
 int initialize_main_thread() {
+
+    if (thread_main_already_created) return SUCCESS_CODE;
 
     ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
 
@@ -58,8 +60,9 @@ int initialize_main_thread() {
     if (AppendFila2(ready_low, main_thread) == SUCCESS_CODE) {
         thread_main_already_created = 1;
         return SUCCESS_CODE;
+
     } else {
-        return FAILED;
+        return ERROR_CREATING_MAIN;
     }
 }
 
@@ -72,10 +75,10 @@ int initialize_main_thread() {
  */
 int ccreate (void* (*start)(void*), void *arg, int prio) {
 
-    // first thing to do is to create the thread main if it is not created
-    if(!thread_main_already_created) {
-        initialize_main_thread();
-    }
+    // First thing to do is to create the thread main if it is not created
+    int init_main_result = initialize_main_thread();
+    if (init_main_result != SUCCESS_CODE) return init_main_result;
+
     // this is the struct that will have the thread block
     TCB_t *tcb = (TCB_t *) malloc(sizeof(TCB_t));
 

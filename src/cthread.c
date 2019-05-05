@@ -64,7 +64,7 @@ int initialize_main_thread() {
 }
 
 /**
- * ccrete is responsible for creating a new threading and adding it to the ready queue
+ * ccreate is responsible for creating a new threading and adding it to the ready queue
  * @param start: pointer for the function that will be executed
  * @param arg: arguments for the function
  * @param prio: thread priority

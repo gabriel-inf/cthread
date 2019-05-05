@@ -85,11 +85,6 @@ int scheduler_get_first_ready_thread( TCB_t** next ) {
 	
 }
 
-/**
- * If there is a thread to be executed, it will set the context and deal with the queues
- * @return: return if everything was ok
- */
- 
 int scheduler_schedule_next_thread() {
     
     if (executing == NULL) return EMPTY_LINE;

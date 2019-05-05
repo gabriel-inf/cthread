@@ -6,7 +6,7 @@
 #define HIGH_PRIO 2
 
 PFILA2 executing, ready_low, ready_medium, ready_high;
-ucontext_t mcontext;
+ucontext_t mcontext; // TODO: Is this really necessary?
 
 /*--------------------------------------------------------------------------------
 Função:	Recebe um semaforo e insere a thread que executa no momento na fila do semaforo.
@@ -35,5 +35,12 @@ Ret:
 
 int scheduler_insert_in_ready(TCB_t *thread);
 
+/**
+ * If there is a thread to be executed, it will set the context and deal with the queues
+ * @return: return if everything was ok
+ */
+int scheduler_schedule_next_thread();
+
+int scheduler_kill_thread_from_exec();
 
 #endif

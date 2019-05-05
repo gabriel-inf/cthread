@@ -43,4 +43,10 @@ int scheduler_schedule_next_thread();
 
 int scheduler_kill_thread_from_exec();
 
+/**
+ * Moves the executing iterator to the first node and returns it already cast as TCB_t*
+ * @return The executing thread, or NULL if there is any error accessing the node
+ */
+TCB_t* scheduler_get_executing_thread();
+
 #endif

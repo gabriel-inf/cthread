@@ -9,14 +9,12 @@
 
 int scheduler_block_thread(csem_t *sem) {
 
-
-	if (executing == NULL) return NULL_POINTER;
 	if (sem == NULL) return NULL_POINTER;
 	if (sem->fila == NULL) return NULL_POINTER;
 	
-	if (FirstFila2(executing) != SUCCESS_CODE) return EMPTY_LINE;
-	
-	TCB_t *executing_thread = (TCB_t *) executing->first->node;
+	TCB_t *executing_thread = scheduler_get_executing_thread();
+	if (executing_thread == NULL) return NULL_POINTER;
+
 	executing_thread->state = PROCST_BLOQ;
 	
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;		
@@ -24,7 +22,7 @@ int scheduler_block_thread(csem_t *sem) {
 	
 	if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
 	return scheduler_schedule_next_thread();
-	
+
 	//TCB_t *next = malloc(sizeof(TCB_t));
 	//if (scheduler_get_first_ready_thread( &next ) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 	
@@ -131,10 +129,8 @@ int scheduler_schedule_next_thread() {
 
 int scheduler_kill_thread_from_exec() {
 
-	if (executing == NULL) return NULL_POINTER;
-	if (FirstFila2(executing) != SUCCESS_CODE) return EMPTY_LINE;
-
-	TCB_t *executing_thread = (TCB_t *) GetAtIteratorFila2(executing);
+	TCB_t *executing_thread = scheduler_get_executing_thread();
+	if (executing_thread == NULL) return NULL_POINTER;
 	
 	executing_thread->state = PROCST_TERMINO;
 
@@ -164,4 +160,11 @@ int scheduler_insert_in_ready(TCB_t *thread) {
             return ERROR_PRIO_NOT_DEFINED;
     }
 
+}
+
+TCB_t* scheduler_get_executing_thread() {
+    if (executing == NULL) return NULL;
+    if (FirstFila2(executing) != SUCCESS_CODE) return NULL;
+
+    return (TCB_t *) GetAtIteratorFila2(executing);
 }

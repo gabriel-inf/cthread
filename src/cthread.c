@@ -20,12 +20,12 @@ int thread_main_already_created = 0;
  * Handle the thread termination
  * is used as a callback for the makecontext function
  */
-int handle_termination() {
+void *handle_termination() {
 
 	printf("handle termination");
     if (scheduler_kill_thread_from_exec() != SUCCESS_CODE) {
 		printf("\n\n\nThis shit failed");
-		return FAILED;
+		return;
 	}
 	printf("\n\n\ndid not failed\n");
 
@@ -37,19 +37,25 @@ int handle_termination() {
 		printf("\n\n\n 1111 - did not failed \n");
 	}
 
-    return resss;
+    return;
 }
 
 /*
  * Create a context
  */
+ 
 int create_context(ucontext_t* context, ucontext_t* next) {
 
-    if(getcontext(context) == FAILED) {
+    if (getcontext(context) == FAILED) {
         return FAILED;
     }
-
-    context->uc_link = next;
+    
+    if (next == NULL) {
+    	context->uc_link = 0;
+    } else {
+    	context->uc_link = next;
+    }
+    
     context->uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
     context->uc_stack.ss_size = SIGSTKSZ;
 
@@ -70,8 +76,7 @@ int initialize_main_thread() {
 
     TCB_t *main_thread = malloc(sizeof(TCB_t));
     main_thread->tid = MAIN_TID;
-    main_thread->prio = LOW_PRIO;
-
+    main_thread->prio = LOW_PRIO; //cade um ->context = context
 
 
 	int insertion_result = scheduler_insert_in_ready(main_thread);
@@ -91,9 +96,9 @@ int initialize_main_thread() {
  */
 int ccreate (void* (*start)(void*), void *arg, int prio) {
     // first thing to do is to create the thread main if it is not created
-	initialize_state_queues();
-
+	
     if(!thread_main_already_created) {
+    	initialize_state_queues();
         initialize_main_thread();
     }
 	
@@ -110,14 +115,20 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     create_context(callback_context, NULL);
     makecontext(callback_context, (void (*) (void)) handle_termination, 0); // when called, the callback_context will execute the handle_termination function
 
-    create_context(&(tcb->context), callback_context); // here is tricky, when the thread context is finished, it points to the current context (callback)
+
+	// here is tricky, when the thread context is finished, it points to the current context (callback)
+    if (create_context(&(tcb->context), callback_context)) return FAILED;     
+    
     makecontext(&(tcb->context), (void (*) (void)) start, 1, arg);
+    tcb->context.uc_link = callback_context;
+    
+    if (tcb->context.uc_link == NULL) return FAILED;
 
     // adding the tcb to the ready queue with priority verification
     int insertion_result = scheduler_insert_in_ready(tcb);
     if ( insertion_result != SUCCESS_CODE) return insertion_result;
 
-	scheduler_schedule_next_thread();
+	//scheduler_schedule_next_thread();
     
     return tcb->tid; 
 	

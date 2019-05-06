@@ -7,39 +7,76 @@
 
 #include "../include/support.h"
 #include "../include/cthread.h"
+#include "../include/cdata.h"
+#include "../include/error.h"
+#include "../include/scheduler.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <ucontext.h>
 
+csem_t *semaphore_test;
 
 void* func1(void *arg) {
-	printf("Func1 has been executed\n");
-	return 0;
+	printf("Func1 has been executed lalallalalalala\n");
+	//return;
 }
 
 void* func2(void *i) {
-	int n;
-	n = *(int *)i;
-	printf("Func 2 has been executed with number %d \n", n);
+	printf("Func 2 has been executed lalalallalalal\n");
+	cwait(semaphore_test);
+	printf("Func 2 has been FINISHED\n");
+}
+
+void *function() {
+
+	printf("thread sendo executada\n");
+	return;
+
+}
+
+void teste_create_context() {
+
+	ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
+	
+
+}
+
+int test_ccreate() {
+
+	int i = 2;
+	assert (ccreate(function, (void *)&i, 0) > 0);
 	return 0;
+
 }
 
 int main(int argc, char **argv) {
 	int id0, id1;
 	int i = 10;
 
-	id0 = 1;
-	id1 = 2;
+	id0 = 10;
+	id1 = 20;
 
-	id0 = ccreate(func1, (void *)&i, 1);
-/*	id1 = ccreate(func2, (void *)&i, 0);*/
+	semaphore_test = malloc(sizeof(csem_t));
+	
+	if (csem_init(semaphore_test, -10) != SUCCESS_CODE) {
+		printf("NUM DEU, COMPANHEIRO\n");
+	}
+
+	id0 = ccreate(func1, (void *)&i, MEDIUM_PRIO);
+	id1 = ccreate(func2, (void *)&i, HIGH_PRIO);
 
 /*	printf("Threads fatorial e Fibonnaci criadas...\n");*/
 
-	printf("%d \n", id0);
-	printf("%d \n", id1);
+	printf("resultado da criacao = %d \n", id0);
+	printf("resultado da criacao = %d \n", id1);
+
+	printf("resultado do retorno = %d", scheduler_schedule_next_thread());
 
 	//cjoin(id0);
 	//cjoin(id1);
 
 	printf("Main retornando para terminar o programa\n");
+	exit(0);
 }
 

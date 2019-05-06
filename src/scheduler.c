@@ -153,14 +153,10 @@ int scheduler_schedule_next_thread() {
     
     next->state = PROCST_EXEC;
 
-
-
     if (AppendFila2(executing, (void *) next) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
     if (&(next->context) == NULL) return FAILED;
 
-    
     if ( next->context.uc_stack.ss_sp == NULL) return NULL_POINTER;
-
 	
 	show_state_queues();
 	printf("\n - The thread that will be executed: %d\n", next->tid);

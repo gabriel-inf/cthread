@@ -19,6 +19,13 @@ csem_t *semaphore_test;
 
 void* func1(void *arg) {
 	printf("Func1 has been executed lalallalalalala\n");
+	assert( SUCCESS_CODE == csignal(semaphore_test));
+	assert( FirstFila2(semaphore_test->fila) != SUCCESS_CODE);
+	assert( FirstFila2(ready_high) == SUCCESS_CODE);
+	assert( ((TCB_t *)GetAtIteratorFila2(ready_high))->tid == 2);
+	printf("testes passaram\n");
+	assert(semaphore_test->count == 0);
+	cwait(semaphore_test);
 	//return;
 }
 
@@ -59,22 +66,17 @@ int main(int argc, char **argv) {
 
 	semaphore_test = malloc(sizeof(csem_t));
 	
-	if (csem_init(semaphore_test, -10) != SUCCESS_CODE) {
+	if (csem_init(semaphore_test, 0) != SUCCESS_CODE) {
 		printf("NUM DEU, COMPANHEIRO\n");
 	}
 
 	id0 = ccreate(func1, (void *)&i, MEDIUM_PRIO);
 	id1 = ccreate(func2, (void *)&i, HIGH_PRIO);
 
-/*	printf("Threads fatorial e Fibonnaci criadas...\n");*/
-
 	printf("resultado da criacao = %d \n", id0);
 	printf("resultado da criacao = %d \n", id1);
 
 	printf("resultado do retorno = %d", scheduler_schedule_next_thread());
-
-	//cjoin(id0);
-	//cjoin(id1);
 
 	printf("Main retornando para terminar o programa\n");
 	exit(0);

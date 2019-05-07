@@ -12,5 +12,6 @@
 
 #define SUCCESS_CODE 0
 
+#define DEBUG 0
 
 #endif

@@ -22,10 +22,10 @@ int initialize_state_queues(){
 	if (ready_high == NULL) return MALLOC_ERROR;
 	if (executing == NULL) return MALLOC_ERROR;
 
-	if (CreateFila2(ready_low) != SUCCES_CODE) return LINE_OPERATION_ERROR;
-	if (CreateFila2(ready_medium) != SUCCES_CODE) return LINE_OPERATION_ERROR;
-	if (CreateFila2(ready_high) != SUCCES_CODE) return LINE_OPERATION_ERROR;
-	if (CreateFila2(executing) != SUCCES_CODE) return LINE_OPERATION_ERROR;
+	if (CreateFila2(ready_low) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+	if (CreateFila2(ready_medium) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+	if (CreateFila2(ready_high) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+	if (CreateFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 
 	return SUCCESS_CODE;
 }

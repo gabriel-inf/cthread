@@ -57,7 +57,7 @@ int create_context(ucontext_t* context, ucontext_t* next) {
     }
     
     char* stack = (char*) malloc(SIGSTKSZ);
-    if (stack == NULL) return FAILED;
+    if (stack == NULL) return MALLOC_ERROR;
     
     context->uc_stack.ss_sp = stack;
     context->uc_stack.ss_size = SIGSTKSZ;

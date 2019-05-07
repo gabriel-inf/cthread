@@ -139,6 +139,11 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
   
 int csem_init(csem_t *sem, int count) {
 
+	if(!thread_main_already_created) {
+    	initialize_state_queues();
+        initialize_main_thread();
+    }
+
 	if (sem == NULL) return NULL_POINTER;
 
     PFILA2 pfila = malloc(sizeof(FILA2));
@@ -156,6 +161,11 @@ int csem_init(csem_t *sem, int count) {
 
 int cwait(csem_t *sem) {
 
+	if(!thread_main_already_created) {
+    	initialize_state_queues();
+        initialize_main_thread();
+    }
+
 	if (sem == NULL) return NULL_POINTER;
 
     sem->count --;
@@ -168,6 +178,11 @@ int cwait(csem_t *sem) {
 }
 
 int csignal(csem_t *sem) {
+
+	if(!thread_main_already_created) {
+    	initialize_state_queues();
+        initialize_main_thread();
+    }
 
 	if (sem == NULL) return NULL_POINTER;
 

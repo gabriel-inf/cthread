@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <ucontext.h>
 
-
-
 //executing, ready_low, ready_medium, ready_high
 int initialize_state_queues(){
 
@@ -157,8 +155,13 @@ int scheduler_schedule_next_thread() {
 
     if ( next->context.uc_stack.ss_sp == NULL) return NULL_POINTER;
 	
-	show_state_queues();
-	printf("\n - The thread that will be executed: %d\n", next->tid);
+	if (DEBUG) {
+	
+		show_state_queues();
+		printf("\n - The thread that will be executed: %d\n", next->tid);
+	
+	}
+	
     return setcontext(&(next->context));
 }
 
@@ -177,7 +180,6 @@ int scheduler_kill_thread_from_exec() {
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 
 	free(executing_thread); //Laura does not have sure
-
 
 	
 	return SUCCESS_CODE;

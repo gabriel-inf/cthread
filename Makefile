@@ -22,10 +22,10 @@ TEST_BIN_DIR=$(TEST_DIR)/bin
 all: cthread libcthread
 
 cthread: scheduler 
-	$(CC) -c $(SRC_DIR)/cthread.c -o $(BIN_DIR)/cthread.o
+	$(CC) -c $(SRC_DIR)/cthread.c -o $(BIN_DIR)/cthread.o -Wall
 
 scheduler:
-	$(CC) -c $(SRC_DIR)/scheduler.c -o $(BIN_DIR)/scheduler.o
+	$(CC) -c $(SRC_DIR)/scheduler.c -o $(BIN_DIR)/scheduler.o -Wall
 
 libcthread:
 	ar rcs $(LIB_DIR)/libcthread.a $(BIN_DIR)/cthread.o $(BIN_DIR)/scheduler.o $(BIN_DIR)/support.o

@@ -27,14 +27,23 @@ $(SEMAPHORE): $(SEMAPHORE).c library
 clean:
 	rm -rf $(TEST_BIN_DIR)/*.o *~
 
-execute_tests: clean clean_lib all
-	clear
+execute_$(SET_PRIO): $(SET_PRIO)
 	./bin/$(SET_PRIO).o
+
+execute_$(YIELD): $(YIELD)
 	./bin/$(YIELD).o
+
+execute_$(SEMAPHORE): $(SEMAPHORE)
 	./bin/$(SEMAPHORE).o
+
+execute_tests: full_clean all
+	clear
+	make execute_$(SET_PRIO)
+	make execute_$(YIELD)
+	make execute_$(SEMAPHORE)
 
 library:
 	cd .. && make all
 
-clean_lib:
+full_clean:
 	cd .. && make clean

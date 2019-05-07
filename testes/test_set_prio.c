@@ -16,7 +16,7 @@ int current_thread_prio() {
 }
 
 void test_main_from_low_to_medium() {
-    printf(__FUNCTION__);
+    printf("Start: %s\n", __FUNCTION__);
 
     assert(current_thread_prio() == LOW_PRIO);
 
@@ -24,31 +24,34 @@ void test_main_from_low_to_medium() {
 
     assert(current_thread_prio() == MEDIUM_PRIO);
 
+    printf("End: %s\n", __FUNCTION__);
     return;
 }
 
 void test_thread_from_high_to_low() {
-    printf(__FUNCTION__);
+    printf("Start: %s\n", __FUNCTION__);
 
     assert(current_thread_prio() == HIGH_PRIO);
 
-    assert(csetprio(NULL, LOW_PRIO) == SUCCESS_CODE);
+    assert(csetprio(0, LOW_PRIO) == SUCCESS_CODE);
 
     csignal(semaphore);
 
+    printf("End: %s\n", __FUNCTION__);
     return;
 }
 
 void test_main_still_medium() {
-    printf(__FUNCTION__);
+    printf("Start: %s\n", __FUNCTION__);
 
     assert(current_thread_prio() == MEDIUM_PRIO);
 
+    printf("End: %s\n", __FUNCTION__);
     return;
 }
 
 int main(int argc, char **argv) {
-    printf("Start");
+    printf("Start main\n");
 
     test_main_from_low_to_medium();
 
@@ -61,7 +64,7 @@ int main(int argc, char **argv) {
 
     test_main_still_medium();
 
-    printf("End");
+    printf("End main\n");
 
     exit(0);
 }

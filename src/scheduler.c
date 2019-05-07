@@ -218,7 +218,8 @@ TCB_t* scheduler_get_executing_thread() {
 
     return (TCB_t *) GetAtIteratorFila2(executing);
 }
-int show_state_queues() {
+
+void scheduler_show_state_queues() {
 
 	printf("---------------------READY QUEUES:-------------------\n");
 
@@ -259,7 +260,4 @@ int show_state_queues() {
 			printf(" -> Thread id: %d, prio: %d\n", thread->tid, thread->prio);
 		} while(NextFila2(ready_high) == SUCCESS_CODE);
 	}
-
-
-
 }

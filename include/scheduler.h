@@ -44,4 +44,6 @@ int scheduler_kill_thread_from_exec();
  */
 TCB_t* scheduler_get_executing_thread();
 
+void scheduler_show_state_queues();
+
 #endif

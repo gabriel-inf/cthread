@@ -11,6 +11,8 @@
 
 #define ERROR_CREATING_MAIN -11
 
+#define INVALID_PRIO -21
+
 #define SUCCESS_CODE 0
 
 

@@ -1,12 +1,7 @@
 #ifndef	__SCHEDULER_H__
 #define	__SCHEDULER_H__
 
-#define LOW_PRIO 0
-#define MEDIUM_PRIO 1
-#define HIGH_PRIO 2
-
 PFILA2 executing, ready_low, ready_medium, ready_high;
-ucontext_t mcontext; // TODO: Is this really necessary?
 
 /*--------------------------------------------------------------------------------
 Função:	Recebe um semaforo e insere a thread que executa no momento na fila do semaforo.

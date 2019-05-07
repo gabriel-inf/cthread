@@ -56,7 +56,10 @@ int create_context(ucontext_t* context, ucontext_t* next) {
     	context->uc_link = next;
     }
     
-    context->uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+    char* stack = (char*) malloc(SIGSTKSZ);
+    if (stack == NULL) return FAILED;
+    
+    context->uc_stack.ss_sp = stack;
     context->uc_stack.ss_size = SIGSTKSZ;
 
     return SUCCESS_CODE;
@@ -117,7 +120,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
 
 
 	// here is tricky, when the thread context is finished, it points to the current context (callback)
-    if (create_context(&(tcb->context), callback_context)) return FAILED;     
+    if (create_context(&(tcb->context), callback_context) != SUCCESS_CODE) return FAILED;     
     
     makecontext(&(tcb->context), (void (*) (void)) start, 1, arg);
     tcb->context.uc_link = callback_context;

@@ -1,7 +1,13 @@
 #ifndef	__SCHEDULER_H__
 #define	__SCHEDULER_H__
 
+#include <ucontext.h>
+
 PFILA2 executing, ready_low, ready_medium, ready_high;
+
+int scheduler_init();
+
+int scheduler_create_context(ucontext_t* context, ucontext_t* next);
 
 /*--------------------------------------------------------------------------------
 Função:	Recebe um semaforo e insere a thread que executa no momento na fila do semaforo.
@@ -37,6 +43,8 @@ int scheduler_insert_in_ready(TCB_t *thread);
 int scheduler_schedule_next_thread();
 
 int scheduler_kill_thread_from_exec();
+
+int scheduler_send_exec_to_ready();
 
 /**
  * Moves the executing iterator to the first node and returns it already cast as TCB_t*

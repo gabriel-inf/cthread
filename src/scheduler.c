@@ -12,21 +12,20 @@
 //executing, ready_low, ready_medium, ready_high
 int initialize_state_queues(){
 
-
 	ready_low = malloc(sizeof(PFILA2));
 	ready_medium = malloc(sizeof(PFILA2));
 	ready_high = malloc(sizeof(PFILA2));
 	executing = malloc(sizeof(PFILA2));
+	
+	if (ready_low == NULL) return MALLOC_ERROR;
+	if (ready_medium == NULL) return MALLOC_ERROR;
+	if (ready_high == NULL) return MALLOC_ERROR;
+	if (executing == NULL) return MALLOC_ERROR;
 
-	CreateFila2(ready_low);
-	CreateFila2(ready_medium);
-	CreateFila2(ready_high);
-	CreateFila2(executing);
-
-	FirstFila2(ready_low);
-	FirstFila2(ready_medium);
-	FirstFila2(ready_high);
-	FirstFila2(executing);
+	if (CreateFila2(ready_low) != SUCCES_CODE) return LINE_OPERATION_ERROR;
+	if (CreateFila2(ready_medium) != SUCCES_CODE) return LINE_OPERATION_ERROR;
+	if (CreateFila2(ready_high) != SUCCES_CODE) return LINE_OPERATION_ERROR;
+	if (CreateFila2(executing) != SUCCES_CODE) return LINE_OPERATION_ERROR;
 
 	return SUCCESS_CODE;
 }

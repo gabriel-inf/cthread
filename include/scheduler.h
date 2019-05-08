@@ -40,11 +40,11 @@ int scheduler_insert_in_ready(TCB_t *thread);
  * If there is a thread to be executed, it will set the context and deal with the queues
  * @return: return if everything was ok
  */
-int scheduler_schedule_next_thread();
+int scheduler_schedule_next_thread(ucontext_t *context_to_leave );
 
 int scheduler_kill_thread_from_exec();
 
-int scheduler_send_exec_to_ready();
+ucontext_t *scheduler_send_exec_to_ready();
 
 /**
  * Moves the executing iterator to the first node and returns it already cast as TCB_t*

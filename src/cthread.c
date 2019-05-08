@@ -22,7 +22,7 @@ void *handle_termination() {
 
     if (first_result != SUCCESS_CODE) return NULL;
 
-	int second_result = scheduler_schedule_next_thread();
+	int second_result = scheduler_schedule_next_thread(NULL);
     if (DEBUG) printf("Second result: %d", second_result);
 
     if (DEBUG) printf("End: %s\n", __FUNCTION__);
@@ -90,10 +90,20 @@ int cyield(void) {
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
-	int state_migration_result = scheduler_send_exec_to_ready();
-	if (state_migration_result != SUCCESS_CODE) return state_migration_result;
-	printf("cyeld end");
-	return scheduler_schedule_next_thread();
+	ucontext_t *state_migration_result = scheduler_send_exec_to_ready();
+	
+	
+	if (state_migration_result != NULL) {
+	
+		return scheduler_schedule_next_thread(state_migration_result);
+	
+	} else {
+	
+		return FAILED;
+	
+	}// return state_migration_result;
+	printf("cyeld end\n\n");
+	
 
 }
 
@@ -133,7 +143,8 @@ int cwait(csem_t *sem) {
 
     sem->count --;
     if (sem->count < 0) {
-
+		
+		printf("chamando da cwait a blocl\n");
         return scheduler_block_thread(sem);
 
     }

@@ -18,7 +18,7 @@
 csem_t *semaphore_test;
 
 void* func1(void *arg) {
-	printf("Func1 has been executed lalallalalalala\n");
+	printf("Func med prio has been executed lalallalalalala\n\n\n\n");
 	assert( SUCCESS_CODE == csignal(semaphore_test));
 	assert( FirstFila2(semaphore_test->fila) != SUCCESS_CODE);
 	assert( FirstFila2(ready_high) == SUCCESS_CODE);
@@ -30,9 +30,9 @@ void* func1(void *arg) {
 }
 
 void* func2(void *i) {
-	printf("Func 2 has been executed lalalallalalal\n");
+	printf("Func high prio has been executed lalalallalalal\n\n\n\n\n");
 	cwait(semaphore_test);
-	printf("Func 2 has been FINISHED\n");
+	printf("Func high prio has been FINISHED\n");
 }
 
 void *function() {

@@ -15,10 +15,10 @@ int did_init = 0;
 int scheduler_initialize_queues() {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
-	ready_low = malloc(sizeof(PFILA2));
-	ready_medium = malloc(sizeof(PFILA2));
-	ready_high = malloc(sizeof(PFILA2));
-	executing = malloc(sizeof(PFILA2));
+	ready_low = malloc(sizeof(FILA2));
+	ready_medium = malloc(sizeof(FILA2));
+	ready_high = malloc(sizeof(FILA2));
+	executing = malloc(sizeof(FILA2));
 	
 	if (ready_low == NULL) return MALLOC_ERROR;
 	if (ready_medium == NULL) return MALLOC_ERROR;
@@ -101,6 +101,8 @@ int scheduler_create_context(ucontext_t* context, ucontext_t* next) {
 
 int scheduler_block_thread(csem_t *sem) {
 
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
+
 	if (sem == NULL) return NULL_POINTER;
 	if (sem->fila == NULL) return NULL_POINTER;
 	
@@ -112,8 +114,9 @@ int scheduler_block_thread(csem_t *sem) {
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;		
 	if (AppendFila2(sem->fila, (void *)executing_thread)) return LINE_OPERATION_ERROR;
 	
-	if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
-	return scheduler_schedule_next_thread();
+	//if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
+	printf("END da block\n");
+	return scheduler_schedule_next_thread(&(executing_thread->context));
 }
 
 int scheduler_free_thread(csem_t *sem) {
@@ -160,7 +163,9 @@ int scheduler_get_first_ready_thread( TCB_t** next ) {
 	}
 }
 
-int scheduler_schedule_next_thread() {
+int scheduler_schedule_next_thread(ucontext_t *context_to_leave) {
+
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
     if (executing == NULL) return EMPTY_LINE;
     
@@ -207,7 +212,18 @@ int scheduler_schedule_next_thread() {
 		printf("\n - The thread that will be executed: %d\n", next->tid);
 	}
 	
-    return setcontext(&(next->context));
+	if (DEBUG) printf("End: %s\n", __FUNCTION__);
+	
+	if (context_to_leave == NULL) {
+	
+		return setcontext(&(next->context));
+	
+	} else {
+	
+		return swapcontext( context_to_leave, &(next->context) );
+	}
+	
+    
 }
 
 int scheduler_kill_thread_from_exec() {
@@ -226,20 +242,23 @@ int scheduler_kill_thread_from_exec() {
 	return SUCCESS_CODE;
 }
 
-int scheduler_send_exec_to_ready() {
+ucontext_t *scheduler_send_exec_to_ready() {
 	
     TCB_t *executing_thread = scheduler_get_executing_thread();
-    if (executing_thread == NULL) return NULL_POINTER;
+    if (executing_thread == NULL) return NULL;
 
 	executing_thread->state = PROCST_APTO;
 
-	if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
+	//if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
 	
-	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return NULL;
 
 	int insert_ready_result = scheduler_insert_in_ready(executing_thread);
-	if (insert_ready_result != SUCCESS_CODE) return insert_ready_result;
-	return insert_ready_result;
+	if (insert_ready_result != SUCCESS_CODE) return NULL;
+	//return insert_ready_result;
+	
+	return &(executing_thread->context);
+	
 }
 
 

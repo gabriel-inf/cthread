@@ -95,12 +95,6 @@ int cyield(void) {
 
 	return scheduler_schedule_next_thread();
 
-/*	exec_tcb = scheduler_get_executing_thread();*/
-/*	scheduler_get_first_ready_thread(&next_tcb);*/
-
-
-	
-
 }
 
   

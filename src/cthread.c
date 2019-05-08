@@ -18,12 +18,12 @@ void *handle_termination() {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
     int first_result = scheduler_kill_thread_from_exec();
-    if (DEBUG) printf("First result: %d", first_result);
+    if (DEBUG) printf("First result: %d\n", first_result);
 
     if (first_result != SUCCESS_CODE) return NULL;
 
-	int second_result = scheduler_schedule_next_thread();
-    if (DEBUG) printf("Second result: %d", second_result);
+	int second_result = scheduler_schedule_next_thread(NULL); // Actually should not get past here since it changes the context
+    if (DEBUG) printf("\n\nATTENTION: SHOULD NOT HAVE ARRIVED HERE\n\nSecond result: %d", second_result);
 
     if (DEBUG) printf("End: %s\n", __FUNCTION__);
 
@@ -90,11 +90,16 @@ int cyield(void) {
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
-	int state_migration_result = scheduler_send_exec_to_ready();
-	if (state_migration_result != SUCCESS_CODE) return state_migration_result;
+    //gets the thread that will leave executing
+    ucontext_t *state_migration_result = scheduler_send_exec_to_ready();
 
-	return scheduler_schedule_next_thread();
+    if (state_migration_result != NULL) {
+        //calls function to deal with context changing
+        return scheduler_schedule_next_thread(state_migration_result);
 
+    } else {
+        return FAILED;
+    }
 }
 
   

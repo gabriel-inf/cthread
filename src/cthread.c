@@ -99,6 +99,9 @@ int cyield(void) {
 
   
 int csem_init(csem_t *sem, int count) {
+
+	printf("%s\n\n", __FUNCTION__);
+
     if (sem == NULL) return NULL_POINTER;
 
     // First thing to do is to create the thread main if it is not created
@@ -119,6 +122,9 @@ int csem_init(csem_t *sem, int count) {
 }
 
 int cwait(csem_t *sem) {
+
+	printf("%s\n\n", __FUNCTION__);
+
     if (sem == NULL) return NULL_POINTER;
 
     // First thing to do is to create the thread main if it is not created
@@ -135,13 +141,18 @@ int cwait(csem_t *sem) {
 }
 
 int csignal(csem_t *sem) {
+
+	printf("%s\n\n", __FUNCTION__);
+
     if (sem == NULL) return NULL_POINTER;
 
     // First thing to do is to create the thread main if it is not created
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
-	if (FirstFila2(sem->fila) != SUCCESS_CODE) sem->count ++;
+	//if (FirstFila2(sem->fila) != SUCCESS_CODE) 
+
+	sem->count ++;
 
     if (sem->count <= 0) {
         return scheduler_free_thread(sem);

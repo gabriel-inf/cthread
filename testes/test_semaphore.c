@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 
 	semaphore_test = malloc(sizeof(csem_t));
 	
-	if (csem_init(semaphore_test, 1) != SUCCESS_CODE) {
+	if (csem_init(semaphore_test, 0) != SUCCESS_CODE) {
 		printf("NUM DEU, COMPANHEIRO\n");
 	}
 
@@ -77,12 +77,27 @@ int main(int argc, char **argv) {
 	printf("resultado da criacao = %d \n", id1);
 
 	cyield();
-
+	
+	printf("Main retornando para terminar o programa\n\n\n\n\n");
+	
+	//assert(FirstFila2(semaphore_test->fila) == SUCCESS_CODE);
+	//assert(semaphore_test->count == -1);	
+	//assert( ((TCB_t *)GetAtIteratorFila2(executing))->tid == 0);
+	
 	//printf("resultado do retorno = %d \n", scheduler_schedule_next_thread());
-	csignal(semaphore_test);
-	cyield();
+	//csignal(semaphore_test);
+	/*
+	assert(FirstFila2(semaphore_test->fila) != SUCCESS_CODE);
+	assert(semaphore_test->count == 0);
+	assert( ((TCB_t *)GetAtIteratorFila2(executing))->tid == 0);
+	
+	printf("Passou semaphoro\n");
+	
+	//cyield();
 
-	printf("Main retornando para terminar o programa\n");
+	assert( ((TCB_t *)GetAtIteratorFila2(executing))->tid == 0);
+*/
+	
 	exit(0);
 }
 

@@ -90,27 +90,27 @@ int cyield(void) {
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
+	//gets the thread that will leave executing
+
 	ucontext_t *state_migration_result = scheduler_send_exec_to_ready();
-	
 	
 	if (state_migration_result != NULL) {
 	
+		//calls function to deal with context changing
 		return scheduler_schedule_next_thread(state_migration_result);
 	
 	} else {
 	
 		return FAILED;
 	
-	}// return state_migration_result;
-	printf("cyeld end\n\n");
-	
+	}
 
 }
 
   
 int csem_init(csem_t *sem, int count) {
 
-	printf("%s\n\n", __FUNCTION__);
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
     if (sem == NULL) return NULL_POINTER;
 
@@ -133,7 +133,7 @@ int csem_init(csem_t *sem, int count) {
 
 int cwait(csem_t *sem) {
 
-	printf("%s\n\n", __FUNCTION__);
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
     if (sem == NULL) return NULL_POINTER;
 
@@ -144,7 +144,6 @@ int cwait(csem_t *sem) {
     sem->count --;
     if (sem->count < 0) {
 		
-		printf("chamando da cwait a blocl\n");
         return scheduler_block_thread(sem);
 
     }
@@ -153,7 +152,7 @@ int cwait(csem_t *sem) {
 
 int csignal(csem_t *sem) {
 
-	printf("%s\n\n", __FUNCTION__);
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
     if (sem == NULL) return NULL_POINTER;
 
@@ -163,12 +162,11 @@ int csignal(csem_t *sem) {
 
 	//if (FirstFila2(sem->fila) != SUCCESS_CODE) 
 
-	sem->count ++;
+	sem->count++;
 
     if (sem->count <= 0) {
         return scheduler_free_thread(sem);
     }
-	printf("hey\n");
 
     return SUCCESS_CODE;
 }

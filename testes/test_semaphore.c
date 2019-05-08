@@ -26,6 +26,7 @@ void* func1(void *arg) {
 	printf("testes passaram\n");
 	assert(semaphore_test->count == 0);
 	cwait(semaphore_test);
+	printf("Func med terminando de executar\n");
 	//return;
 }
 
@@ -45,7 +46,6 @@ void *function() {
 void teste_create_context() {
 
 	ucontext_t *current_context = (ucontext_t*) malloc(sizeof(ucontext_t));
-	
 
 }
 
@@ -80,23 +80,27 @@ int main(int argc, char **argv) {
 	
 	printf("Main retornando para terminar o programa\n\n\n\n\n");
 	
-	//assert(FirstFila2(semaphore_test->fila) == SUCCESS_CODE);
-	//assert(semaphore_test->count == -1);	
-	//assert( ((TCB_t *)GetAtIteratorFila2(executing))->tid == 0);
+	assert(FirstFila2(semaphore_test->fila) == SUCCESS_CODE);
+	assert(semaphore_test->count == -1);	
+	assert( ((TCB_t *)GetAtIteratorFila2(executing))->tid == 0);
 	
 	//printf("resultado do retorno = %d \n", scheduler_schedule_next_thread());
-	//csignal(semaphore_test);
-	/*
+	
+	csignal(semaphore_test);
+	
 	assert(FirstFila2(semaphore_test->fila) != SUCCESS_CODE);
 	assert(semaphore_test->count == 0);
 	assert( ((TCB_t *)GetAtIteratorFila2(executing))->tid == 0);
 	
+	scheduler_show_state_queues();
+	
 	printf("Passou semaphoro\n");
 	
-	//cyield();
+	cyield();
 
 	assert( ((TCB_t *)GetAtIteratorFila2(executing))->tid == 0);
-*/
+
+	printf("Main terminando de vez\n\n\n\n\n");
 	
 	exit(0);
 }

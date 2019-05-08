@@ -80,6 +80,7 @@ int scheduler_init() {
 int scheduler_create_context(ucontext_t* context, ucontext_t* next) {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
+	//Laura not sure se isso tbm nao deveria estar no fim da funcao... mas esta funcionando..
     if (getcontext(context) == FAILED) return FAILED;
 
     if (next == NULL) {
@@ -114,8 +115,6 @@ int scheduler_block_thread(csem_t *sem) {
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;		
 	if (AppendFila2(sem->fila, (void *)executing_thread)) return LINE_OPERATION_ERROR;
 	
-	//if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
-	printf("END da block\n");
 	return scheduler_schedule_next_thread(&(executing_thread->context));
 }
 
@@ -222,7 +221,6 @@ int scheduler_schedule_next_thread(ucontext_t *context_to_leave) {
 	
 		return swapcontext( context_to_leave, &(next->context) );
 	}
-	
     
 }
 
@@ -248,14 +246,11 @@ ucontext_t *scheduler_send_exec_to_ready() {
     if (executing_thread == NULL) return NULL;
 
 	executing_thread->state = PROCST_APTO;
-
-	//if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
 	
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return NULL;
 
 	int insert_ready_result = scheduler_insert_in_ready(executing_thread);
 	if (insert_ready_result != SUCCESS_CODE) return NULL;
-	//return insert_ready_result;
 	
 	return &(executing_thread->context);
 	

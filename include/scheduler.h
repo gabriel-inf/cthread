@@ -37,12 +37,19 @@ Ret:
 int scheduler_insert_in_ready(TCB_t *thread);
 
 /**
- * If there is a thread to be executed, it will set the context and deal with the queues
- * @return: return if everything was ok
+ * Receives the thread to leave execution or NULL. In the first case, it swaps the thread with 
+ a new one to be executed. If there is no, it just set the context to another one. 
+ * Deals with the queues
+ * @return: return if everything was okS
  */
 int scheduler_schedule_next_thread(ucontext_t *context_to_leave );
 
 int scheduler_kill_thread_from_exec();
+
+/**
+ * Deletes executing thread from executing queue. Updates state its state.
+ * @return The context of the executing thread
+ */
 
 ucontext_t *scheduler_send_exec_to_ready();
 

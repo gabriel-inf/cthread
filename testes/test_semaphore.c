@@ -92,6 +92,8 @@ int main(int argc, char **argv) {
 	
 	assert(FirstFila2(semaphore_test->fila) != SUCCESS_CODE);
 	assert(semaphore_test->count == 0);
+
+    assert( FirstFila2(executing) == SUCCESS_CODE);
 	assert( ((TCB_t *)GetAtIteratorFila2(executing))->tid == 0);
 	
 	scheduler_show_state_queues();
@@ -100,6 +102,7 @@ int main(int argc, char **argv) {
 	
 	cyield();
 
+    assert( FirstFila2(executing) == SUCCESS_CODE);
 	assert( ((TCB_t *)GetAtIteratorFila2(executing))->tid == 0);
 
 	printf("Main terminando de vez\n");

@@ -86,7 +86,6 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
 int cyield(void) {
     // First thing to do is to create the thread main if it is not created
 
-	TCB_t *exec_tcb, *next_tcb;
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
@@ -169,4 +168,17 @@ int csetprio(int tid, int prio) {
     executing_thread->prio = prio;
 
     return SUCCESS_CODE;
+}
+
+int cjoin(int tid) {
+    // First thing to do is to create the thread main if it is not created
+    int init_result = scheduler_init();
+    if (init_result != SUCCESS_CODE) return init_result;
+
+    // A thread can only block one other thread
+    if (scheduler_get_pair_with_blocker(tid) != NULL) return ALREADY_JOINED_ERROR;
+
+    if (scheduler_thread_exists(tid) != SUCCESS_CODE) return INVALID_THREAD;
+
+    return scheduler_wait_thread(tid);
 }

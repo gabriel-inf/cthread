@@ -66,7 +66,14 @@ ucontext_t *scheduler_send_exec_to_ready();
  * Moves the executing iterator to the first node and returns it already cast as TCB_t*
  * @return The executing thread, or NULL if there is any error accessing the node
  */
-TCB_t* scheduler_get_executing_thread();
+TCB_t *scheduler_get_executing_thread();
+
+/// Returns the pair with the thread being blocked by tid, or NULL if none
+JP_t *scheduler_get_pair_with_blocker(int tid);
+
+int scheduler_thread_exists(int tid);
+
+int scheduler_wait_thread(int tid);
 
 void scheduler_show_state_queues();
 

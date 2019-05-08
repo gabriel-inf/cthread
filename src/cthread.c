@@ -52,6 +52,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     // First thing to do is to create the thread main if it is not created
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
+
 	
     // this is the structure that will have the thread block
     TCB_t *tcb = (TCB_t *) malloc(sizeof(TCB_t));
@@ -84,6 +85,8 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
 
 int cyield(void) {
     // First thing to do is to create the thread main if it is not created
+
+	TCB_t *exec_tcb, *next_tcb;
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
@@ -91,6 +94,13 @@ int cyield(void) {
 	if (state_migration_result != SUCCESS_CODE) return state_migration_result;
 
 	return scheduler_schedule_next_thread();
+
+/*	exec_tcb = scheduler_get_executing_thread();*/
+/*	scheduler_get_first_ready_thread(&next_tcb);*/
+
+
+	
+
 }
 
   

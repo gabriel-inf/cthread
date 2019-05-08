@@ -227,18 +227,19 @@ int scheduler_kill_thread_from_exec() {
 }
 
 int scheduler_send_exec_to_ready() {
+	
     TCB_t *executing_thread = scheduler_get_executing_thread();
     if (executing_thread == NULL) return NULL_POINTER;
-	
+
 	executing_thread->state = PROCST_APTO;
+
+	getcontext(&(executing_thread->context));
 	
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 
 	int insert_ready_result = scheduler_insert_in_ready(executing_thread);
 	if (insert_ready_result != SUCCESS_CODE) return insert_ready_result;
-    scheduler_show_state_queues();
-	printf("\nTid=%d, Tprio=%d\n", executing_thread->tid, executing_thread->prio);
-	return scheduler_insert_in_ready(executing_thread);
+	return insert_ready_result;
 }
 
 

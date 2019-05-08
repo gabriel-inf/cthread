@@ -92,7 +92,7 @@ int cyield(void) {
 
 	int state_migration_result = scheduler_send_exec_to_ready();
 	if (state_migration_result != SUCCESS_CODE) return state_migration_result;
-
+	printf("cyeld end");
 	return scheduler_schedule_next_thread();
 
 }
@@ -141,12 +141,12 @@ int csignal(csem_t *sem) {
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
-    sem->count ++;
+	if (FirstFila2(sem->fila) != SUCCESS_CODE) sem->count ++;
+
     if (sem->count <= 0) {
-
         return scheduler_free_thread(sem);
-
     }
+	printf("hey\n");
 
     return SUCCESS_CODE;
 }

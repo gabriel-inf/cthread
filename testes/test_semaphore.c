@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 
 	semaphore_test = malloc(sizeof(csem_t));
 	
-	if (csem_init(semaphore_test, 0) != SUCCESS_CODE) {
+	if (csem_init(semaphore_test, 1) != SUCCESS_CODE) {
 		printf("NUM DEU, COMPANHEIRO\n");
 	}
 
@@ -79,6 +79,8 @@ int main(int argc, char **argv) {
 	cyield();
 
 	//printf("resultado do retorno = %d \n", scheduler_schedule_next_thread());
+	csignal(semaphore_test);
+	cyield();
 
 	printf("Main retornando para terminar o programa\n");
 	exit(0);

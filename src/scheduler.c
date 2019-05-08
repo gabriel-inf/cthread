@@ -233,7 +233,7 @@ int scheduler_send_exec_to_ready() {
 
 	executing_thread->state = PROCST_APTO;
 
-	getcontext(&(executing_thread->context));
+	if (getcontext(&(executing_thread->context)) == FAILED) return FAILED;
 	
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 

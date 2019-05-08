@@ -15,20 +15,26 @@ int did_init = 0;
 int scheduler_initialize_queues() {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
-	ready_low = malloc(sizeof(PFILA2));
-	ready_medium = malloc(sizeof(PFILA2));
-	ready_high = malloc(sizeof(PFILA2));
-	executing = malloc(sizeof(PFILA2));
+	ready_low = malloc(sizeof(FILA2));
+	ready_medium = malloc(sizeof(FILA2));
+	ready_high = malloc(sizeof(FILA2));
+	executing = malloc(sizeof(FILA2));
+	blocked = malloc(sizeof(FILA2));
+	joined = malloc(sizeof(FILA2));
 	
 	if (ready_low == NULL) return MALLOC_ERROR;
 	if (ready_medium == NULL) return MALLOC_ERROR;
 	if (ready_high == NULL) return MALLOC_ERROR;
 	if (executing == NULL) return MALLOC_ERROR;
+    if (blocked == NULL) return MALLOC_ERROR;
+    if (joined == NULL) return MALLOC_ERROR;
 
 	if (CreateFila2(ready_low) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 	if (CreateFila2(ready_medium) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 	if (CreateFila2(ready_high) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 	if (CreateFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+    if (CreateFila2(blocked) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
+    if (CreateFila2(joined) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 
     if (DEBUG) printf("End: %s\n", __FUNCTION__);
 
@@ -77,7 +83,7 @@ int scheduler_init() {
 /**
  * Create a context
  */
-int scheduler_create_context(ucontext_t* context, ucontext_t* next) {
+int scheduler_create_context(ucontext_t *context, ucontext_t *next) {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
     if (getcontext(context) == FAILED) return FAILED;

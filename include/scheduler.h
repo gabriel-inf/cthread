@@ -3,11 +3,21 @@
 
 #include <ucontext.h>
 
-PFILA2 executing, ready_low, ready_medium, ready_high;
+/// Queues of TCB_t
+PFILA2 executing, ready_low, ready_medium, ready_high, blocked;
+
+/// Queue of JP_t, thread that called cjoin on another thread
+PFILA2 joined;
+
+/// Used to represent a thread that called cjoin and the tid it is waiting
+typedef struct s_join_pair {
+    TCB_t *blocked_thread;
+    int	blocker_tid;
+} JP_t;
 
 int scheduler_init();
 
-int scheduler_create_context(ucontext_t* context, ucontext_t* next);
+int scheduler_create_context(ucontext_t *context, ucontext_t *next);
 
 /*--------------------------------------------------------------------------------
 Função:	Recebe um semaforo e insere a thread que executa no momento na fila do semaforo.

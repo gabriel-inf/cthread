@@ -211,8 +211,6 @@ int scheduler_schedule_next_thread(ucontext_t *context_to_leave) {
 		printf("\n - The thread that will be executed: %d\n", next->tid);
 	}
 	
-	if (DEBUG) printf("End: %s\n", __FUNCTION__);
-	
 	if (context_to_leave == NULL) {
 	
 		return setcontext(&(next->context));

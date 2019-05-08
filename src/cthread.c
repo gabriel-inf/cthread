@@ -18,14 +18,11 @@ void *handle_termination() {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
     int first_result = scheduler_kill_thread_from_exec();
-    if (DEBUG) printf("First result: %d", first_result);
+    if (DEBUG) printf("First result: %d\n", first_result);
 
     if (first_result != SUCCESS_CODE) return NULL;
 
 	int second_result = scheduler_schedule_next_thread(NULL);
-    if (DEBUG) printf("Second result: %d", second_result);
-
-    if (DEBUG) printf("End: %s\n", __FUNCTION__);
 
     return NULL;
 }

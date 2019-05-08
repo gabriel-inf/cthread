@@ -25,7 +25,7 @@ void* func1(void *arg) {
 void* func2(void *i) {
 	printf("Func 2 has been executed lalalallalalal\n");
 	
-	//show_state_queues();
+	//scheduler_show_state_queues();
 	cyield();
 	return 0;
 }
@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 	printf("Resultado da criacao = %d \n", id0);
 	printf("Resultado da criacao = %d \n", id1);
 
-	//show_state_queues();
+	//scheduler_show_state_queues();
 
 	cyield(); // main cede e deve ir para apto;
 

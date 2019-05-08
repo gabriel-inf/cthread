@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 	printf("resultado da criacao = %d \n", id0);
 	printf("resultado da criacao = %d \n", id1);
 
-	printf("resultado do retorno = %d", scheduler_schedule_next_thread());
+	printf("resultado do retorno = %d \n", scheduler_schedule_next_thread());
 
 	printf("Main retornando para terminar o programa\n");
 	exit(0);

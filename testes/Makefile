@@ -9,39 +9,41 @@ BIN_DIR=../bin
 TEST_BIN_DIR=./bin
 TEST_DIR=../testes
 
-all: ccreate_test
+SET_PRIO=test_set_prio
+YIELD=test_yield
+SEMAPHORE=test_semaphore
 
-ccreate_test: ccreate_test.c $(LIB_DIR)/libcthread.a
-	$(CC) -o $(TEST_BIN_DIR)/ccreate_test.o ccreate_test0.c -L$(LIB_DIR) -lcthread -Wall
+all: $(SET_PRIO) $(YIELD) $(SEMAPHORE)
+
+$(SET_PRIO): $(SET_PRIO).c library
+	$(CC) -o $(TEST_BIN_DIR)/$(SET_PRIO).o $(SET_PRIO).c -L$(LIB_DIR) -lcthread -Wall
+
+$(YIELD): $(YIELD).c library
+	$(CC) -o $(TEST_BIN_DIR)/$(YIELD).o $(YIELD).c -L$(LIB_DIR) -lcthread -Wall
+
+$(SEMAPHORE): $(SEMAPHORE).c library
+	$(CC) -o $(TEST_BIN_DIR)/$(SEMAPHORE).o $(SEMAPHORE).c -L$(LIB_DIR) -lcthread -Wall
 
 clean:
 	rm -rf $(TEST_BIN_DIR)/*.o *~
 
-execute_tests: clean clean_lib dependencies ccreate_test
+execute_$(SET_PRIO): $(SET_PRIO)
+	./bin/$(SET_PRIO).o
+
+execute_$(YIELD): $(YIELD)
+	./bin/$(YIELD).o
+
+execute_$(SEMAPHORE): $(SEMAPHORE)
+	./bin/$(SEMAPHORE).o
+
+execute_tests: full_clean all
 	clear
-	./bin/ccreate_test.o
+	make execute_$(SET_PRIO)
+	make execute_$(YIELD)
+	make execute_$(SEMAPHORE)
 
-# THIS IS FROM THE OTHER MAKEFILE
+library:
+	cd .. && make all
 
-dependencies: cthread libcthread
-
-cthread: scheduler 
-	$(CC) -c $(SRC_DIR)/cthread.c -o $(BIN_DIR)/cthread.o
-	
-
-scheduler:
-	$(CC) -c $(SRC_DIR)/scheduler.c -o $(BIN_DIR)/scheduler.o
-
-libcthread:
-	ar rcs $(LIB_DIR)/libcthread.a $(BIN_DIR)/cthread.o $(BIN_DIR)/scheduler.o $(BIN_DIR)/support.o
-
-clean_lib:
-	find $(BIN_DIR)/*.o ! -name 'support.o' -type f -exec rm -f {} +
-	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*~ $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
-	
-linker:
-	clear
-	$(CC) -c $(SRC_DIR)/cthread.c -o $(BIN_DIR)/cthread.o
-	$(CC) -c $(SRC_DIR)/scheduler.c -o $(BIN_DIR)/scheduler.o
-	$(CC) -o $(TEST_DIR)/ccreate_test $(TEST_DIR)/ccreate_test.c $(BIN_DIR)/support.o $(BIN_DIR)/scheduler.o $(BIN_DIR)/cthread.o
-	./$(TEST_DIR)/ccreate_test
+full_clean:
+	cd .. && make clean

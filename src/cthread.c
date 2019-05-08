@@ -8,97 +8,50 @@
 #include "../include/error.h"
 #include "../include/scheduler.h"
 
-// Other important constants
-#define MAIN_TID 0
-
-
 int id_count = 1;
-int thread_main_already_created = 0;
 
-
-/*
+/**
  * Handle the thread termination
  * is used as a callback for the makecontext function
  */
 void *handle_termination() {
+    if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
-	printf("handle termination");
-    if (scheduler_kill_thread_from_exec() != SUCCESS_CODE) {
-		printf("\n\n\nThis shit failed");
-		return;
-	}
-	printf("\n\n\ndid not failed\n");
+    int first_result = scheduler_kill_thread_from_exec();
+    if (DEBUG) printf("First result: %d", first_result);
 
-	int resss = scheduler_schedule_next_thread();
+    if (first_result != SUCCESS_CODE) return NULL;
 
-	if (resss == SUCCESS_CODE) {
-	printf("\n\n\n 1111 - did not failed \n");
-	} else {
-		printf("\n\n\n 1111 - did not failed \n");
-	}
+	int second_result = scheduler_schedule_next_thread();
+    if (DEBUG) printf("Second result: %d", second_result);
 
-    return;
+    if (DEBUG) printf("End: %s\n", __FUNCTION__);
+
+    return NULL;
 }
 
-/*
- * Create a context
- */
- 
-int create_context(ucontext_t* context, ucontext_t* next) {
+int validate_prio(int prio) {
+    if (prio == HIGH_PRIO || prio == MEDIUM_PRIO || prio == LOW_PRIO) {
+        return SUCCESS_CODE;
 
-    if (getcontext(context) == FAILED) {
-        return FAILED;
-    }
-    
-    if (next == NULL) {
-    	context->uc_link = 0;
     } else {
-    	context->uc_link = next;
+        return INVALID_PRIO;
     }
-    
-    char* stack = (char*) malloc(SIGSTKSZ);
-    if (stack == NULL) return MALLOC_ERROR;
-    
-    context->uc_stack.ss_sp = stack;
-    context->uc_stack.ss_size = SIGSTKSZ;
-
-    return SUCCESS_CODE;
-}
-
-/*
- *  Initializes the main thread
- *  returns 0 if succeeded and -1 if failed
- */
-int initialize_main_thread() {
-
-    TCB_t *main_thread = malloc(sizeof(TCB_t));
-    main_thread->tid = MAIN_TID;
-    main_thread->prio = LOW_PRIO;
-	if (create_context(&(main_thread->context), NULL) != SUCCESS_CODE) return FAILED;
-
-	int insertion_result = AppendFila2(executing, (void *) main_thread);
-    if (insertion_result != SUCCESS_CODE) return FAILED;
-        
-    thread_main_already_created = 1;
-
-	return insertion_result;
-
 }
 
 /**
- * ccrete is responsible for creating a new threading and adding it to the ready queue
+ * ccreate is responsible for creating a new threading and adding it to the ready queue
  * @param start: pointer for the function that will be executed
  * @param arg: arguments for the function
  * @param prio: thread priority
  * @return returns the thread id or failure code
  */
 int ccreate (void* (*start)(void*), void *arg, int prio) {
-    // first thing to do is to create the thread main if it is not created
-	
-    if(!thread_main_already_created) {
-    	initialize_state_queues();
-        initialize_main_thread();
-    }
+    if (validate_prio(prio) != SUCCESS_CODE) return INVALID_PRIO;
+
+    // First thing to do is to create the thread main if it is not created
+    int init_result = scheduler_init();
+    if (init_result != SUCCESS_CODE) return init_result;
 	
     // this is the structure that will have the thread block
     TCB_t *tcb = (TCB_t *) malloc(sizeof(TCB_t));
@@ -110,12 +63,12 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
 
     // this context will be used as callback
     ucontext_t *callback_context = (ucontext_t*) malloc(sizeof(ucontext_t));
-    create_context(callback_context, NULL);
+    scheduler_create_context(callback_context, NULL);
     makecontext(callback_context, (void (*) (void)) handle_termination, 0); // when called, the callback_context will execute the handle_termination function
 
 
 	// here is tricky, when the thread context is finished, it points to the current context (callback)
-    if (create_context(&(tcb->context), callback_context) != SUCCESS_CODE) return FAILED;     
+    if (scheduler_create_context(&(tcb->context), callback_context) != SUCCESS_CODE) return FAILED;
     
     makecontext(&(tcb->context), (void (*) (void)) start, 1, arg);
     tcb->context.uc_link = callback_context;
@@ -126,33 +79,27 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     int insertion_result = scheduler_insert_in_ready(tcb);
     if ( insertion_result != SUCCESS_CODE) return insertion_result;
     
-    return tcb->tid; 
-	
+    return tcb->tid;
 }
 
 int cyield(void) {
+    // First thing to do is to create the thread main if it is not created
+    int init_result = scheduler_init();
+    if (init_result != SUCCESS_CODE) return init_result;
 
-	if(!thread_main_already_created) {
-    	initialize_state_queues();
-        initialize_main_thread();
-    }
-
-	int state_migration_result = send_exec_to_ready();
+	int state_migration_result = scheduler_send_exec_to_ready();
 	if (state_migration_result != SUCCESS_CODE) return state_migration_result;
 
 	return scheduler_schedule_next_thread();
-
 }
 
   
 int csem_init(csem_t *sem, int count) {
+    if (sem == NULL) return NULL_POINTER;
 
-	if(!thread_main_already_created) {
-    	initialize_state_queues();
-        initialize_main_thread();
-    }
-
-	if (sem == NULL) return NULL_POINTER;
+    // First thing to do is to create the thread main if it is not created
+    int init_result = scheduler_init();
+    if (init_result != SUCCESS_CODE) return init_result;
 
     PFILA2 pfila = malloc(sizeof(FILA2));
    	if (pfila == NULL) return MALLOC_ERROR;
@@ -168,13 +115,11 @@ int csem_init(csem_t *sem, int count) {
 }
 
 int cwait(csem_t *sem) {
+    if (sem == NULL) return NULL_POINTER;
 
-	if(!thread_main_already_created) {
-    	initialize_state_queues();
-        initialize_main_thread();
-    }
-
-	if (sem == NULL) return NULL_POINTER;
+    // First thing to do is to create the thread main if it is not created
+    int init_result = scheduler_init();
+    if (init_result != SUCCESS_CODE) return init_result;
 
     sem->count --;
     if (sem->count < 0) {
@@ -186,13 +131,11 @@ int cwait(csem_t *sem) {
 }
 
 int csignal(csem_t *sem) {
+    if (sem == NULL) return NULL_POINTER;
 
-	if(!thread_main_already_created) {
-    	initialize_state_queues();
-        initialize_main_thread();
-    }
-
-	if (sem == NULL) return NULL_POINTER;
+    // First thing to do is to create the thread main if it is not created
+    int init_result = scheduler_init();
+    if (init_result != SUCCESS_CODE) return init_result;
 
     sem->count ++;
     if (sem->count <= 0) {
@@ -200,6 +143,21 @@ int csignal(csem_t *sem) {
         return scheduler_free_thread(sem);
 
     }
+
+    return SUCCESS_CODE;
+}
+
+int csetprio(int tid, int prio) {
+    if (validate_prio(prio) != SUCCESS_CODE) return INVALID_PRIO;
+
+    // First thing to do is to create the thread main if it is not created
+    int init_result = scheduler_init();
+    if (init_result != SUCCESS_CODE) return init_result;
+
+    TCB_t *executing_thread = scheduler_get_executing_thread();
+    if (executing_thread == NULL) return NULL_POINTER;
+
+    executing_thread->prio = prio;
 
     return SUCCESS_CODE;
 }

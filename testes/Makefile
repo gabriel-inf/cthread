@@ -12,8 +12,9 @@ TEST_DIR=../testes
 SET_PRIO=test_set_prio
 YIELD=test_yield
 SEMAPHORE=test_semaphore
+JOIN=test_join
 
-all: $(SET_PRIO) $(YIELD) $(SEMAPHORE)
+all: $(SET_PRIO) $(YIELD) $(SEMAPHORE) $(JOIN)
 
 $(SET_PRIO): $(SET_PRIO).c library
 	$(CC) -o $(TEST_BIN_DIR)/$(SET_PRIO).o $(SET_PRIO).c -L$(LIB_DIR) -lcthread -Wall
@@ -23,6 +24,9 @@ $(YIELD): $(YIELD).c library
 
 $(SEMAPHORE): $(SEMAPHORE).c library
 	$(CC) -o $(TEST_BIN_DIR)/$(SEMAPHORE).o $(SEMAPHORE).c -L$(LIB_DIR) -lcthread -Wall
+
+$(JOIN): $(JOIN).c library
+	$(CC) -o $(TEST_BIN_DIR)/$(JOIN).o $(JOIN).c -L$(LIB_DIR) -lcthread -Wall
 
 clean:
 	rm -rf $(TEST_BIN_DIR)/*.o *~
@@ -36,11 +40,15 @@ execute_$(YIELD): $(YIELD)
 execute_$(SEMAPHORE): $(SEMAPHORE)
 	./bin/$(SEMAPHORE).o
 
+execute_$(JOIN): $(JOIN)
+	./bin/$(JOIN).o
+
 execute_tests: full_clean all
 	clear
 	make execute_$(SET_PRIO)
 	make execute_$(YIELD)
 	make execute_$(SEMAPHORE)
+	make execute_$(JOIN)
 
 library:
 	cd .. && make all

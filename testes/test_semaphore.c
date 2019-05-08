@@ -21,7 +21,7 @@ void* func1(void *arg) {
 	printf("Func1 has been executed lalallalalalala\n");
 	assert( SUCCESS_CODE == csignal(semaphore_test));
 	assert( FirstFila2(semaphore_test->fila) != SUCCESS_CODE);
-	assert( FirstFila2(ready_medium) == SUCCESS_CODE);
+	assert( FirstFila2(ready_high) == SUCCESS_CODE);
 	assert( ((TCB_t *)GetAtIteratorFila2(ready_high))->tid == 2);
 	printf("testes passaram\n");
 	assert(semaphore_test->count == 0);
@@ -76,7 +76,9 @@ int main(int argc, char **argv) {
 	printf("resultado da criacao = %d \n", id0);
 	printf("resultado da criacao = %d \n", id1);
 
-	printf("resultado do retorno = %d \n", scheduler_schedule_next_thread());
+	cyield();
+
+	//printf("resultado do retorno = %d \n", scheduler_schedule_next_thread());
 
 	printf("Main retornando para terminar o programa\n");
 	exit(0);

@@ -194,6 +194,7 @@ int cjoin(int tid) {
 }
 
 int cidentify (char *name, int size) {
+    if (name == NULL ) return NULL_POINTER;
   int i = 0;
 	char identity[100] = {0};
 

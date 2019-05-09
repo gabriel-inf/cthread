@@ -18,14 +18,11 @@ void *handle_termination() {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
     int first_result = scheduler_kill_thread_from_exec();
-    if (DEBUG) printf("First result: %d", first_result);
+    if (DEBUG) printf("First result: %d\n", first_result);
 
     if (first_result != SUCCESS_CODE) return NULL;
 
-	int second_result = scheduler_schedule_next_thread();
-    if (DEBUG) printf("Second result: %d", second_result);
-
-    if (DEBUG) printf("End: %s\n", __FUNCTION__);
+	int second_result = scheduler_schedule_next_thread(NULL);
 
     return NULL;
 }
@@ -90,15 +87,28 @@ int cyield(void) {
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
-	int state_migration_result = scheduler_send_exec_to_ready();
-	if (state_migration_result != SUCCESS_CODE) return state_migration_result;
+	//gets the thread that will leave executing
 
-	return scheduler_schedule_next_thread();
+	ucontext_t *state_migration_result = scheduler_send_exec_to_ready();
+	
+	if (state_migration_result != NULL) {
+	
+		//calls function to deal with context changing
+		return scheduler_schedule_next_thread(state_migration_result);
+	
+	} else {
+	
+		return FAILED;
+	
+	}
 
 }
 
   
 int csem_init(csem_t *sem, int count) {
+
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
+
     if (sem == NULL) return NULL_POINTER;
 
     // First thing to do is to create the thread main if it is not created
@@ -119,6 +129,9 @@ int csem_init(csem_t *sem, int count) {
 }
 
 int cwait(csem_t *sem) {
+
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
+
     if (sem == NULL) return NULL_POINTER;
 
     // First thing to do is to create the thread main if it is not created
@@ -127,7 +140,7 @@ int cwait(csem_t *sem) {
 
     sem->count --;
     if (sem->count < 0) {
-
+		
         return scheduler_block_thread(sem);
 
     }
@@ -135,17 +148,21 @@ int cwait(csem_t *sem) {
 }
 
 int csignal(csem_t *sem) {
+
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
+
     if (sem == NULL) return NULL_POINTER;
 
     // First thing to do is to create the thread main if it is not created
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
-    sem->count ++;
+	//if (FirstFila2(sem->fila) != SUCCESS_CODE) 
+
+	sem->count++;
+
     if (sem->count <= 0) {
-
         return scheduler_free_thread(sem);
-
     }
 
     return SUCCESS_CODE;

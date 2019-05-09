@@ -366,9 +366,12 @@ int scheduler_wait_thread(int tid) {
     if (executing_thread->tid == tid) return CANNOT_JOIN_ITSELF;
 
     JP_t *new_pair = malloc(sizeof(JP_t));
+    if (new_pair == NULL) return MALLOC_ERROR;
+
     new_pair->blocker_tid = tid;
     new_pair->blocked_thread = executing_thread;
 
+    if (FirstFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
     if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
     if (joined == NULL) return NULL_POINTER;
     if (AppendFila2(joined, new_pair)) return LINE_OPERATION_ERROR;

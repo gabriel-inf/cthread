@@ -35,6 +35,7 @@ execute_$(SET_PRIO): $(SET_PRIO)
 	./bin/$(SET_PRIO).o
 
 execute_$(YIELD): $(YIELD)
+	clear
 	./bin/$(YIELD).o
 
 execute_$(SEMAPHORE): $(SEMAPHORE)

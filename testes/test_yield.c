@@ -31,7 +31,7 @@ void* func3(void *arg) {
 
 void* func1(void *arg) {
 	printf("Func1 has been executed\n");
-	cjoin(4);
+	assert(cjoin(4) == SUCCESS_CODE);
 	printf("Func1 came back\n");
 	return 0;
 }
@@ -39,9 +39,10 @@ void* func1(void *arg) {
 void* func2(void *i) {
 	int id0;	
 	printf("Func 2 has been executed\n");
-	cyield();
+	assert(cyield());
 	printf("Func 2 came back\n");
 	id0 = ccreate(func3, (void*) NULL, MEDIUM_PRIO);
+	assert(id0 > 0);
 	printf("Resultado da criacao = %d \n", id0);
 	printf("Func 2 terminated\n");
 	return 0;
@@ -58,10 +59,13 @@ int main(int argc, char **argv) {
 	printf("Resultado da criacao = %d \n", id0);
 	printf("Resultado da criacao = %d \n", id1);
 
-	// assert( ccreate(NULL, (void *)&i, MEDIUM_PRIO) > 0 );
+	assert( ccreate(NULL, (void *)&i, MEDIUM_PRIO) == NULL_POINTER );
 
-	cyield(); // main cede e deve ir para apto;
-
+	assert(cyield() == SUCCESS_CODE); // main cede e deve ir para apto;
+	assert(cyield() == SUCCESS_CODE);
+	assert(cyield() == SUCCESS_CODE);
+	assert(cyield() == SUCCESS_CODE);
+	assert(cyield() == SUCCESS_CODE);
 	
 
 	printf("Main retornando para terminar o programa\n");

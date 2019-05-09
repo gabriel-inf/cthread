@@ -12,8 +12,9 @@
 
 int did_init = 0;
 
-// There is no need for it to be public, so I wont add to header
+// There is no need for it to be public, so I wont them add to the header
 int scheduler_free_waiting_thread(int tid);
+int scheduler_has_thread_ready();
 
 int scheduler_initialize_queues() {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
@@ -143,6 +144,9 @@ int scheduler_block_thread(csem_t *sem) {
 
 	if (sem == NULL) return NULL_POINTER;
 	if (sem->fila == NULL) return NULL_POINTER;
+
+	// Without this, it would cause a deadlock
+	if (scheduler_has_thread_ready() != SUCCESS_CODE) return NOTHING_TO_SCHEDULE;
 	
 	TCB_t *executing_thread = scheduler_get_executing_thread();
 	if (executing_thread == NULL) return NULL_POINTER;
@@ -169,6 +173,22 @@ int scheduler_free_thread(csem_t *sem) {
 	
 	if (DeleteAtIteratorFila2(sem->fila) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 	return scheduler_insert_in_ready(thread_to_wake);
+}
+
+/// Similar to scheduler_get_first_ready_thread, but only tests if there is any thread available
+int scheduler_has_thread_ready() {
+    if ((ready_high != NULL) && (FirstFila2(ready_high) == SUCCESS_CODE) && (GetAtIteratorFila2(ready_high) != NULL)) {
+        return SUCCESS_CODE;
+
+    } else if ((ready_medium != NULL) && (FirstFila2(ready_medium) == SUCCESS_CODE) && (GetAtIteratorFila2(ready_medium) != NULL)) {
+        return SUCCESS_CODE;
+
+    } else if ((ready_low != NULL) && (FirstFila2(ready_low) == SUCCESS_CODE) && (GetAtIteratorFila2(ready_low) != NULL)) {
+        return SUCCESS_CODE;
+
+    } else {
+        return NOTHING_TO_SCHEDULE;
+    }
 }
 
 /**
@@ -272,8 +292,7 @@ int scheduler_kill_thread_from_exec() {
 	int free_result = scheduler_free_waiting_thread(executing_thread->tid);
 	if (free_result != SUCCESS_CODE) return free_result;
 
-	// TODO: Test this somehow
-	free(executing_thread); // Laura does not have sure
+	free(executing_thread);
 
 	return SUCCESS_CODE;
 }
@@ -360,6 +379,9 @@ int scheduler_thread_exists(int tid) {
 }
 
 int scheduler_wait_thread(int tid) {
+    // Without this, it would cause a deadlock
+    if (scheduler_has_thread_ready() != SUCCESS_CODE) return NOTHING_TO_SCHEDULE;
+
     TCB_t *executing_thread = scheduler_get_executing_thread();
     if (executing_thread == NULL) return NULL_POINTER;
 

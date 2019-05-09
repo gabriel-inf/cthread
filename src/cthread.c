@@ -22,7 +22,8 @@ void *handle_termination() {
 
     if (first_result != SUCCESS_CODE) return NULL;
 
-	int second_result = scheduler_schedule_next_thread(NULL);
+	int second_result = scheduler_schedule_next_thread(NULL); // Actually should not get past here since it changes the context
+    if (DEBUG) printf("\n\nATTENTION: SHOULD NOT HAVE ARRIVED HERE\n\nSecond result: %d", second_result);
 
     return NULL;
 }
@@ -83,25 +84,19 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
 int cyield(void) {
     // First thing to do is to create the thread main if it is not created
 
-	TCB_t *exec_tcb, *next_tcb;
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
-	//gets the thread that will leave executing
+    //gets the thread that will leave executing
+    ucontext_t *state_migration_result = scheduler_send_exec_to_ready();
 
-	ucontext_t *state_migration_result = scheduler_send_exec_to_ready();
-	
-	if (state_migration_result != NULL) {
-	
-		//calls function to deal with context changing
-		return scheduler_schedule_next_thread(state_migration_result);
-	
-	} else {
-	
-		return FAILED;
-	
-	}
+    if (state_migration_result != NULL) {
+        //calls function to deal with context changing
+        return scheduler_schedule_next_thread(state_migration_result);
 
+    } else {
+        return FAILED;
+    }
 }
 
   
@@ -181,4 +176,17 @@ int csetprio(int tid, int prio) {
     executing_thread->prio = prio;
 
     return SUCCESS_CODE;
+}
+
+int cjoin(int tid) {
+    // First thing to do is to create the thread main if it is not created
+    int init_result = scheduler_init();
+    if (init_result != SUCCESS_CODE) return init_result;
+
+    // A thread can only block one other thread
+    if (scheduler_get_pair_with_blocker(tid) != NULL) return ALREADY_JOINED_ERROR;
+
+    if (scheduler_thread_exists(tid) != SUCCESS_CODE) return INVALID_THREAD;
+
+    return scheduler_wait_thread(tid);
 }

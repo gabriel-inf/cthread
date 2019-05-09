@@ -23,4 +23,5 @@ add_executable(sisopT1
         src/scheduler.c
         testes/test_semaphore.c
         testes/test_yield.c
-        testes/test_set_prio.c)
+        testes/test_set_prio.c
+        testes/test_join.c)

@@ -151,9 +151,7 @@ int csignal(csem_t *sem) {
     // First thing to do is to create the thread main if it is not created
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
-
-	//if (FirstFila2(sem->fila) != SUCCESS_CODE) 
-
+    
 	sem->count++;
 
     if (sem->count <= 0) {

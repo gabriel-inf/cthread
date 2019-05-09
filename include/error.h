@@ -15,12 +15,11 @@
 
 #define ALREADY_JOINED_ERROR -31
 #define INVALID_THREAD -32
-#define CANNOT_JOIN_ITSELF -33
 
 #define INVALID_BLOCKED_THREAD -41
 
 #define SUCCESS_CODE 0
 
-#define DEBUG 1
+#define DEBUG 0
 
 #endif

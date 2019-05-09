@@ -39,8 +39,7 @@ void* func2(void *i) {
 void *function() {
 
 	printf("thread sendo executada\n");
-	return;
-
+	return NULL;
 }
 
 void teste_create_context() {

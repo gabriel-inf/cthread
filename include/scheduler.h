@@ -57,9 +57,9 @@ int scheduler_schedule_next_thread(ucontext_t *context_to_leave);
 int scheduler_kill_thread_from_exec();
 
 /**
-  * Deletes executing thread from executing queue. Updates state its state.
-  * @return The context of the executing thread
-  */
+ * Deletes executing thread from executing queue. Updates state its state.
+ * @return The context of the executing thread
+ */
 ucontext_t *scheduler_send_exec_to_ready();
 
 /**

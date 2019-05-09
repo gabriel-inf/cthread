@@ -25,8 +25,6 @@ void *handle_termination() {
 	int second_result = scheduler_schedule_next_thread(NULL); // Actually should not get past here since it changes the context
     if (DEBUG) printf("\n\nATTENTION: SHOULD NOT HAVE ARRIVED HERE\n\nSecond result: %d", second_result);
 
-    if (DEBUG) printf("End: %s\n", __FUNCTION__);
-
     return NULL;
 }
 
@@ -103,6 +101,9 @@ int cyield(void) {
 
   
 int csem_init(csem_t *sem, int count) {
+
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
+
     if (sem == NULL) return NULL_POINTER;
 
     // First thing to do is to create the thread main if it is not created
@@ -123,6 +124,9 @@ int csem_init(csem_t *sem, int count) {
 }
 
 int cwait(csem_t *sem) {
+
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
+
     if (sem == NULL) return NULL_POINTER;
 
     // First thing to do is to create the thread main if it is not created
@@ -131,7 +135,7 @@ int cwait(csem_t *sem) {
 
     sem->count --;
     if (sem->count < 0) {
-
+		
         return scheduler_block_thread(sem);
 
     }
@@ -139,17 +143,21 @@ int cwait(csem_t *sem) {
 }
 
 int csignal(csem_t *sem) {
+
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
+
     if (sem == NULL) return NULL_POINTER;
 
     // First thing to do is to create the thread main if it is not created
     int init_result = scheduler_init();
     if (init_result != SUCCESS_CODE) return init_result;
 
-    sem->count ++;
+	//if (FirstFila2(sem->fila) != SUCCESS_CODE) 
+
+	sem->count++;
+
     if (sem->count <= 0) {
-
         return scheduler_free_thread(sem);
-
     }
 
     return SUCCESS_CODE;

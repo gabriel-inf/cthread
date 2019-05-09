@@ -40,6 +40,6 @@ execute_tests:
 linker:
 	$(CC) -c $(SRC_DIR)/cthread.c -o $(BIN_DIR)/cthread.o
 	$(CC) -c $(SRC_DIR)/scheduler.c -o $(BIN_DIR)/scheduler.o
-	$(CC) -o $(SRC_EXP)/teste_scheduleia $(SRC_EXP)/teste_scheduler.c $(BIN_DIR)/support.o $(BIN_DIR)/scheduler.o $(BIN_DIR)/cthread.o
+	$(CC) -o $(SRC_EXP)/teste_semapheia $(TEST_DIR)/test_semaphore.c $(BIN_DIR)/support.o $(BIN_DIR)/scheduler.o $(BIN_DIR)/cthread.o
 
 

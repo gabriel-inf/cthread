@@ -89,6 +89,7 @@ int scheduler_init() {
 int scheduler_create_context(ucontext_t *context, ucontext_t *next) {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
+	//Laura not sure se isso tbm nao deveria estar no fim da funcao... mas esta funcionando..
     if (getcontext(context) == FAILED) return FAILED;
 
     if (next == NULL) {
@@ -137,6 +138,8 @@ int scheduler_remove_from_blocked_queue(TCB_t *thread) {
 }
 
 int scheduler_block_thread(csem_t *sem) {
+
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
 	if (sem == NULL) return NULL_POINTER;
 	if (sem->fila == NULL) return NULL_POINTER;
@@ -200,6 +203,8 @@ int scheduler_get_first_ready_thread( TCB_t** next ) {
 }
 
 int scheduler_schedule_next_thread(ucontext_t *context_to_leave) {
+
+	if (DEBUG) printf("Start: %s\n", __FUNCTION__);
 
     if (executing == NULL) return EMPTY_LINE;
     
@@ -279,8 +284,6 @@ ucontext_t *scheduler_send_exec_to_ready() {
     if (executing_thread == NULL) return NULL;
 
 	executing_thread->state = PROCST_APTO;
-
-	getcontext(&(executing_thread->context));
 	
 	if (DeleteAtIteratorFila2(executing) != SUCCESS_CODE) return NULL;
 

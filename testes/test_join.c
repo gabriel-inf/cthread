@@ -81,7 +81,8 @@ int main(int argc, char **argv) {
     assert(step == 3);
     step = 4;
 
-    assert(cjoin(0) == CANNOT_JOIN_ITSELF);
+    // The thread cannot join itself
+    assert(cjoin(0) == INVALID_THREAD);
 
     assert(step == 4);
     step = 5;

@@ -197,7 +197,7 @@ int cidentify (char *name, int size) {
   int i = 0;
 	char identity[100] = {0};
 
-	strcpy(identity, "Gabriel Stepien 00265035\nLaura Corsac XXXXXXX\nRodrigo Cardoso XXXXXX\n");
+	strcpy(identity, "Gabriel Stepien 00265035\nLaura Corsac XXXXXXX\nRodrigo C Buske 206526\n");
 	for(i=0;i<size && i < 100;i++) {
 		name[i] = identity[i];
 	}

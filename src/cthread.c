@@ -45,6 +45,8 @@ int validate_prio(int prio) {
  * @return returns the thread id or failure code
  */
 int ccreate (void* (*start)(void*), void *arg, int prio) {
+
+	if (start == NULL) return NULL_POINTER;
     if (validate_prio(prio) != SUCCESS_CODE) return INVALID_PRIO;
 
     // First thing to do is to create the thread main if it is not created
@@ -190,3 +192,19 @@ int cjoin(int tid) {
 
     return scheduler_wait_thread(tid);
 }
+
+int cidentify (char *name, int size) {
+  int i = 0;
+	char identity[100] = {0};
+
+	strcpy(identity, "Gabriel Stepien 00265035\nLaura Corsac XXXXXXX\nRodrigo Cardoso XXXXXX\n");
+	for(i=0;i<size && i < 100;i++) {
+		name[i] = identity[i];
+	}
+  if(strcmp(identity,name) == 0) {
+    return SUCCESS_CODE;
+  } else {
+    return FAILED;
+  }
+};
+

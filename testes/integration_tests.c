@@ -193,6 +193,9 @@ int main(int argc, char **argv) {
 	testCcreate();
 	testCcreateCyield();
 	testCcreateCyieldChain();
+	char *name = (char*) malloc(sizeof(char));	
+	cidentify(name, 90);
+	printf("%s\n", name);
 	
 /*	int id0, id1;*/
 /*	int i = 10;*/

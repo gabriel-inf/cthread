@@ -31,7 +31,7 @@ void* func3(void *arg) {
 
 void* func1(void *arg) {
 	printf("Func1 has been executed\n");
-	assert(cjoin(4) == SUCCESS_CODE);
+	assert( cjoin(2) == SUCCESS_CODE );
 	printf("Func1 came back\n");
 	return 0;
 }
@@ -39,7 +39,7 @@ void* func1(void *arg) {
 void* func2(void *i) {
 	int id0;	
 	printf("Func 2 has been executed\n");
-	assert(cyield());
+	assert(cyield() == SUCCESS_CODE);
 	printf("Func 2 came back\n");
 	id0 = ccreate(func3, (void*) NULL, MEDIUM_PRIO);
 	assert(id0 > 0);
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 	assert( ccreate(NULL, (void *)&i, MEDIUM_PRIO) == NULL_POINTER );
 
 	assert(cyield() == SUCCESS_CODE); // main cede e deve ir para apto;
-	assert(cyield() == SUCCESS_CODE);
+	assert(cyield() == SUCCESS_CODE); // daqui pra frente não deve aconecer troca de contexto para nenhum fluxo de controle, segue a main!
 	assert(cyield() == SUCCESS_CODE);
 	assert(cyield() == SUCCESS_CODE);
 	assert(cyield() == SUCCESS_CODE);

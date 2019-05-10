@@ -194,18 +194,7 @@ int cjoin(int tid) {
 }
 
 int cidentify (char *name, int size) {
-    if (name == NULL ) return NULL_POINTER;
-  int i = 0;
-	char identity[100] = {0};
-
-	strcpy(identity, "Gabriel Stepien 00265035\nLaura Corsac 00274694\nRodrigo C Buske 206526\n");
-	for(i=0;i<size && i < 100;i++) {
-		name[i] = identity[i];
-	}
-  if(strcmp(identity,name) == 0) {
-    return SUCCESS_CODE;
-  } else {
-    return FAILED;
-  }
+	if (strncpy(name, "Gabriel Stepien 00265035\nLaura Corsac XXXXXXX\nRodrigo Cardoso XXXXXX\n", size) != SUCCESS_CODE) return FAILED;
+	return SUCCESS_CODE;
 };
 

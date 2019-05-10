@@ -12,8 +12,9 @@
 
 int did_init = 0;
 
-// There is no need for it to be public, so I wont add to header
+// There is no need for it to be public, so I wont them add to the header
 int scheduler_free_waiting_thread(int tid);
+int scheduler_has_thread_ready();
 
 int scheduler_initialize_queues() {
     if (DEBUG) printf("Start: %s\n", __FUNCTION__);
@@ -143,6 +144,9 @@ int scheduler_block_thread(csem_t *sem) {
 
 	if (sem == NULL) return NULL_POINTER;
 	if (sem->fila == NULL) return NULL_POINTER;
+
+	// Without this, it would cause a deadlock
+	if (scheduler_has_thread_ready() != SUCCESS_CODE) return NOTHING_TO_SCHEDULE;
 	
 	TCB_t *executing_thread = scheduler_get_executing_thread();
 	if (executing_thread == NULL) return NULL_POINTER;
@@ -169,6 +173,22 @@ int scheduler_free_thread(csem_t *sem) {
 	
 	if (DeleteAtIteratorFila2(sem->fila) != SUCCESS_CODE) return LINE_OPERATION_ERROR;
 	return scheduler_insert_in_ready(thread_to_wake);
+}
+
+/// Similar to scheduler_get_first_ready_thread, but only tests if there is any thread available
+int scheduler_has_thread_ready() {
+    if ((ready_high != NULL) && (FirstFila2(ready_high) == SUCCESS_CODE) && (GetAtIteratorFila2(ready_high) != NULL)) {
+        return SUCCESS_CODE;
+
+    } else if ((ready_medium != NULL) && (FirstFila2(ready_medium) == SUCCESS_CODE) && (GetAtIteratorFila2(ready_medium) != NULL)) {
+        return SUCCESS_CODE;
+
+    } else if ((ready_low != NULL) && (FirstFila2(ready_low) == SUCCESS_CODE) && (GetAtIteratorFila2(ready_low) != NULL)) {
+        return SUCCESS_CODE;
+
+    } else {
+        return NOTHING_TO_SCHEDULE;
+    }
 }
 
 /**
@@ -272,8 +292,7 @@ int scheduler_kill_thread_from_exec() {
 	int free_result = scheduler_free_waiting_thread(executing_thread->tid);
 	if (free_result != SUCCESS_CODE) return free_result;
 
-	// TODO: Test this somehow
-	free(executing_thread); // Laura does not have sure
+	free(executing_thread);
 
 	return SUCCESS_CODE;
 }
@@ -360,10 +379,14 @@ int scheduler_thread_exists(int tid) {
 }
 
 int scheduler_wait_thread(int tid) {
+    // Without this, it would cause a deadlock
+    if (scheduler_has_thread_ready() != SUCCESS_CODE) return NOTHING_TO_SCHEDULE;
+
     TCB_t *executing_thread = scheduler_get_executing_thread();
     if (executing_thread == NULL) return NULL_POINTER;
 
-    if (executing_thread->tid == tid) return CANNOT_JOIN_ITSELF;
+    // Actually should not reach here since the executing thread is not tested on scheduler_thread_exists, but is better to be safe than sorry
+    if (executing_thread->tid == tid) return INVALID_THREAD;
 
     JP_t *new_pair = malloc(sizeof(JP_t));
     if (new_pair == NULL) return MALLOC_ERROR;
@@ -402,7 +425,7 @@ int scheduler_free_waiting_thread(int tid) {
 
 void scheduler_show_state_queues() {
 
-	printf("---------------------READY QUEUES:-------------------\n");
+	printf("\n\n---------------------READY QUEUES:-------------------\n");
 
 	if (FirstFila2(ready_low) != SUCCESS_CODE) printf("- READY_LOW IS EMPTY!\n");
 	else {
@@ -413,7 +436,7 @@ void scheduler_show_state_queues() {
 		} while(NextFila2(ready_low) == SUCCESS_CODE);
 	}
 
-	if (FirstFila2(ready_medium) != SUCCESS_CODE) printf("- READY_MEDIUM IS EMPTY!\n");
+	if (FirstFila2(ready_medium) != SUCCESS_CODE) printf("\n- READY_MEDIUM IS EMPTY!\n");
 	else {
 		printf("Ready medium:\n");
 		do {
@@ -422,7 +445,7 @@ void scheduler_show_state_queues() {
 		} while(NextFila2(ready_medium) == SUCCESS_CODE);
 	}
 
-	if (FirstFila2(ready_high) != SUCCESS_CODE) printf("- READY_HIGH IS EMPTY!\n");
+	if (FirstFila2(ready_high) != SUCCESS_CODE) printf("\n- READY_HIGH IS EMPTY!\n");
 	else {
 		printf("Ready high:\n");
 		do {
@@ -431,7 +454,29 @@ void scheduler_show_state_queues() {
 		} while(NextFila2(ready_high) == SUCCESS_CODE);
 	}
 
-	printf("---------------------EXEC:-------------------\n");
+    printf("\n\n---------------------BLOCKED:-------------------\n");
+
+    if (FirstFila2(blocked) != SUCCESS_CODE) printf("- Blocked is empty\n");
+    else {
+        printf("Blocked:\n");
+        do {
+            TCB_t *thread = (TCB_t *) GetAtIteratorFila2(blocked);
+            printf(" -> Thread id: %d, prio: %d\n", thread->tid, thread->prio);
+        } while(NextFila2(blocked) == SUCCESS_CODE);
+    }
+
+    printf("\n\n---------------------JOINED:-------------------\n");
+
+    if (FirstFila2(joined) != SUCCESS_CODE) printf("- Joined is empty\n");
+    else {
+        printf("Joined:\n");
+        do {
+            JP_t *pair = (JP_t *) GetAtIteratorFila2(joined);
+            printf(" -> Thread id: %d, prio: %d, is waiting for thread id: %d\n", pair->blocked_thread->tid, pair->blocked_thread->prio, pair->blocker_tid);
+        } while(NextFila2(joined) == SUCCESS_CODE);
+    }
+
+	printf("\n\n---------------------EXEC:-------------------\n");
 
 	if (FirstFila2(executing) != SUCCESS_CODE) printf("- executing is empty\n");
 	else {

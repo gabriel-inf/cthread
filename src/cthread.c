@@ -193,7 +193,7 @@ int cjoin(int tid) {
 
 int cidentify (char *name, int size) {
 	if (name == NULL) return NULL_POINTER;
-	if (strncpy(name, "Gabriel Stepien 00265035\nLaura Corsac XXXXXXX\nRodrigo Cardoso XXXXXX\n", size) != SUCCESS_CODE) return FAILED;
+	if (strncpy(name, "Gabriel Stepien 265035\nLaura Corsac 274694\nRodrigo Cardoso 206526\n", size) != SUCCESS_CODE) return FAILED;
 	return SUCCESS_CODE;
 };
 

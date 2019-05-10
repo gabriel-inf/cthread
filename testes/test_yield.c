@@ -17,16 +17,34 @@
 
 csem_t *semaphore_test;
 
+void* func4(void *arg) {
+	printf("Func 4 has been executed\n");
+	printf("Func4 has been terminated\n");
+	return 0;
+}
+
+void* func3(void *arg) {
+	printf("Func3 has been executed\n");
+	ccreate(func4, (void *) NULL, MEDIUM_PRIO);
+	return 0;
+}
+
 void* func1(void *arg) {
-	printf("Func1 has been executed lalallalalalala\n");
+	printf("Func1 has been executed\n");
+	assert( cjoin(2) == SUCCESS_CODE );
+	printf("Func1 came back\n");
 	return 0;
 }
 
 void* func2(void *i) {
-	printf("Func 2 has been executed lalalallalalal\n");
-	
-	//scheduler_show_state_queues();
-	cyield();
+	int id0;	
+	printf("Func 2 has been executed\n");
+	assert(cyield() == SUCCESS_CODE);
+	printf("Func 2 came back\n");
+	id0 = ccreate(func3, (void*) NULL, MEDIUM_PRIO);
+	assert(id0 > 0);
+	printf("Resultado da criacao = %d \n", id0);
+	printf("Func 2 terminated\n");
 	return 0;
 }
 
@@ -35,16 +53,19 @@ int main(int argc, char **argv) {
 	int id0, id1;
 	int i = 10;
 
-	id0 = ccreate(func1, (void *)&i, MEDIUM_PRIO);
-	id1 = ccreate(func2, (void *)&i, HIGH_PRIO);
+	id0 = ccreate(func1, (void *)&i, HIGH_PRIO);
+	id1 = ccreate(func2, (void *)&i, MEDIUM_PRIO);
 
 	printf("Resultado da criacao = %d \n", id0);
 	printf("Resultado da criacao = %d \n", id1);
 
-	//scheduler_show_state_queues();
+	assert( ccreate(NULL, (void *)&i, MEDIUM_PRIO) == NULL_POINTER );
 
-	cyield(); // main cede e deve ir para apto;
-
+	assert(cyield() == SUCCESS_CODE); // main cede e deve ir para apto;
+	assert(cyield() == SUCCESS_CODE); // daqui pra frente não deve aconecer troca de contexto para nenhum fluxo de controle, segue a main!
+	assert(cyield() == SUCCESS_CODE);
+	assert(cyield() == SUCCESS_CODE);
+	assert(cyield() == SUCCESS_CODE);
 	
 
 	printf("Main retornando para terminar o programa\n");

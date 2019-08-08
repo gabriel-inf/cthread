@@ -1,17 +1,24 @@
 ### cthread
 
-N:1 thread system developed for Operating System class.
+#### N:1 thread system developed for Operating System class.
 
-Gabriel Stepien
-Laura Corsac
-Rodrigo Cardoso Buske
+Students:
 
-Para rodar o exemplo.c
+- Gabriel Stepien
+- Laura Corsac
+- Rodrigo Cardoso Buske
 
-Vai no terminal na pasta "exemplos"
-Executa make clean
-Executa make library
-Executa make exemplo
-Executa ./exemplo.c
+
+in order to run the example "exemplo.c"
+
+(Assiming that you are using the VM given by the teacher)
+- Go to your favorite terminal (maybe you will not have any option but linux terminal)
+- Navigate to "exemplos" folder
+- Execute `make clean`
+- Execute `make library`
+- Execute `make exemplo`
+- Execute `./exemplo.c`
+
+![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
 
 :)

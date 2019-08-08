@@ -11,7 +11,7 @@ Students:
 
 in order to run the example "exemplo.c"
 
-(Assiming that you are using the VM given by the teacher)
+(Assuming that you are using the VM given by the teacher)
 - Go to your favorite terminal (maybe you will not have any option but linux terminal)
 - Navigate to "exemplos" folder
 - Execute `make clean`
